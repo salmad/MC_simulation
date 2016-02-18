@@ -24,6 +24,11 @@ class polymer
         polymer();
         polymer(int Nset);
         void polymer_RW( /* int Nset = 10, */ double r = 0.0);
+        void polymer_RW( double x ,double y ,double z );
+        double mindist( );
+        void polymer_RW_WI( double x ,double y ,double z );
+        void polymer_SAW( double x, double y, double z);
+        void displace_polymer( double x ,double y ,double z );
         virtual ~polymer();
         void update_COM();
 

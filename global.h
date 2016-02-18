@@ -44,7 +44,9 @@ extern int pol_id;
 extern const double kT;
 extern const double lambda;
 extern double k;
-
+extern double disntance_between_COM;
+extern double n0;
+extern double n_end;
 
 
 #endif // GLOBAL_H_INCLUDED

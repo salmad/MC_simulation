@@ -10,6 +10,7 @@
 # include <ctime>
 # include <cmath>
 # include <string>
+# include <cstring>
 # include <sys/stat.h>
 # include <iostream>
 # include <fstream>
@@ -18,6 +19,7 @@
 
 #define NUM_COMMANDS 2
 #define MAX_PART 5000
+
 // #define MAX_MOL  1000
 // #define MAX_POL  100
 
@@ -38,10 +40,83 @@ sim_system::sim_system()
     volume      = V;
     max_part_id = 0;
 
+
+    //cells initialization
+
+    dd.ncells = 1;
+    dd.hoc = NULL;
+    dd.cell_neighbors= NULL;
+    dd.linked_list = new int  [MAX_PART];
+    dd.cell_size = 1.0;
+    memset(dd.linked_list, 0, sizeof(dd.linked_list));
+
     //bond_list;
     //verlet_lsit;
 
 }
+
+// linked list should be created after particle lists (which refer to pointers)
+void sim_system::create1D_linked_list()
+{
+    double z_range = 2*(R+2);
+    dd.ncells = int(z_range/lj_sigma);
+    dd.cell_size = z_range/int(z_range/lj_sigma);
+    cout << "cell size = "<<dd.cell_size << " ncells =" << dd.ncells<< endl;
+
+    //set head of chains to zero
+    for (int i=0; i<dd.ncells; i++)
+    {
+        dd.hoc[i]=0;
+    }
+
+    // fill arrays with particles
+    for (int i=0; i<max_part_id; i++)
+    {
+        molecule m1 = *mol_list[i];
+        int icell = ((m1.z+z_range/2.)/dd.cell_size);
+         cout << "icell = "<< icell << " m.z =" << m1.z<< endl;
+        if (icell > 0 && icell<dd.ncells )
+        {
+            dd.linked_list[i] = dd.hoc[icell];
+            dd.hoc[icell] = i;
+        }
+    }
+
+    //create neighbor list : to be done
+//    dom_decomposition.cell_neighbors = new int * [dom_decomposition.ncells ];
+
+}
+
+//energy using cell list
+double sim_system::recalc_energy_pol_ll(int pol_i, int mol_i)
+{
+    double e    = 0.0;
+    molecule m1 = (poly[pol_i].M[mol_i]);
+    int icell   = int
+    // calculate non-bonded part
+
+    for (int j = 0; j < max_part_id; j++){
+        molecule m2 = *mol_list[j];
+        if(m1.id != m2.id){
+
+        //coulomb interaction
+        //e += electrostatic_energy(m1,m2);
+        //Lennard-jones
+        e += lj_energy(m1,m2);
+        }
+    }
+
+    // go through bonded ... to be done
+
+    e += poly[pol_i].bond_energy(mol_i);
+
+    // we can add some extra energies if necessary, e.g.
+    e += sim_system::extra_energy_pol();
+
+    return e;
+}
+
+
 
 
 // make list of pointer to refer to main particle pointer M and poly
@@ -81,6 +156,7 @@ int sim_system::create_particle_list()
 }
 
 
+
     //  takes a molecule from a list and calculates its energy
 //  energy for a simple mol move, no donded part.
 
@@ -112,17 +188,24 @@ double sim_system::extra_energy_pol()
     double e = 0.0;
     // an example of constraint
     //springs on polymers' centers of masses.
-    poly[0].update_COM();
-    e += 100.0*(poly[0].xc)*(poly[0].xc)+(poly[0].yc)*(poly[0].yc)+(poly[0].zc+7.0)*(poly[0].zc+7.0);
-    poly[1].update_COM();
-    e += 100.0*( poly[1].xc)*( poly[1].xc)+( poly[1].yc)*( poly[1].yc)+( poly[1].zc-7.0)*( poly[1].zc-7.0);
-    poly[2].update_COM();
-    e += 100.0*(poly[2].xc-7.)*(poly[2].xc-7.)+(poly[2].yc)*(poly[2].yc)+(poly[2].zc)*(poly[2].zc);
-    poly[3].update_COM();
-    e += 100.0*(poly[3].xc+7.)*(poly[3].xc+7.)+(poly[3].yc)*(poly[3].yc)+(poly[3].zc)*(poly[3].zc);
+//    poly[0].update_COM();
+    e += 50.0*((poly[0].xc)*(poly[0].xc)+(poly[0].yc)*(poly[0].yc)+(poly[0].zc)*(poly[0].zc));
+//    poly[1].update_COM();
+   e += 50.0*((poly[1].xc)*(poly[1].xc)+(poly[1].yc)*(poly[1].yc)+(poly[1].zc-disntance_between_COM)*(poly[1].zc-disntance_between_COM ));
+//double rc = sqrt((poly[1].xc)*(poly[1].xc)+(poly[1].yc)*(poly[1].yc)+(poly[1].zc)*(poly[1].zc));
+//    e += -2.*exp(-rc*rc/0.7/0.7/2.);
+//    e += exp(500.*(rc-n_end));
+//    e += exp(500.*(n0-rc));
+//    e += log(4*M_PI*rc*rc);
+//    poly[2].update_COM();
+//    e += 100.0*(poly[2].xc-7.)*(poly[2].xc-7.)+(poly[2].yc)*(poly[2].yc)+(poly[2].zc)*(poly[2].zc);
+//    poly[3].update_COM();
+//    e += 100.0*(poly[3].xc+7.)*(poly[3].xc+7.)+(poly[3].yc)*(poly[3].yc)+(poly[3].zc)*(poly[3].zc);
 //    cout << "error here? " << e << endl;
     return e;
 }
+
+
 
 // energy for a polymer bead move
 double sim_system::recalc_energy_pol(int pol_i, int mol_i)
@@ -131,7 +214,7 @@ double sim_system::recalc_energy_pol(int pol_i, int mol_i)
     double e=0.0;
     molecule m1 = (poly[pol_i].M[mol_i]);
 
-    e+=constraint_energy(m1);
+ //   e+=constraint_energy(m1);
 //    cout<< "recalc_energy: constraint energy = "<<e<< endl;
 
     // calculate non-bonded part
@@ -140,7 +223,7 @@ double sim_system::recalc_energy_pol(int pol_i, int mol_i)
         if(m1.id != m2.id){
 
         //coulomb interaction
-        e += electrostatic_energy(m1,m2);
+        //e += electrostatic_energy(m1,m2);
         //Lennard-jones
         e += lj_energy(m1,m2);
         }
@@ -153,11 +236,6 @@ double sim_system::recalc_energy_pol(int pol_i, int mol_i)
     // we can add some extra energies if necessary, e.g.
     e += sim_system::extra_energy_pol();
 
-
-//    for (int i = 0; i < N_polymers; i++){
-//        molecule m = poly[i].M[0];
-//        e += 100.0*(m.x)*(m.x)+(m.y)*(m.y)+(m.z)*(m.z);
-//    }
     return e;
 }
 
@@ -168,23 +246,27 @@ double sim_system::calc_total_energy()
     // nonbonded part
     for(int i=0;i<max_part_id-1;i++){
         molecule m1=*mol_list[i];
-        e+=constraint_energy(m1);
+        //e+=constraint_energy(m1);
 
         for (int j = i+1; j < max_part_id; j++){
             molecule m2 = *mol_list[j];
             //coulomb interaction
-            e += electrostatic_energy(m1,m2);
+            //e += electrostatic_energy(m1,m2);
             //Lennard-jones
             e += lj_energy(m1,m2);
         }
     }
 
-    e += constraint_energy(*mol_list[max_part_id-1]);
+    //e += constraint_energy(*mol_list[max_part_id-1]);
     // bobnded part of energy
     for (int i = 0; i < N_polymers; i++)
     {
         e += poly[i].bond_energy();
+        poly[i].update_COM();
     }
+
+    e += sim_system::extra_energy_pol();
+
     return e;
 }
 
@@ -227,6 +309,7 @@ double sim_system::mc_steps_mol( int Nsteps){
         int index = (int)(drand48()*(double)(N_molecules));
 //        cout <<  "index = "<<index << endl;
         success += mc_step_mol( index);
+
 //        if (success==1){
 ////            M[index].print();
 //            }
@@ -237,6 +320,89 @@ double sim_system::mc_steps_mol( int Nsteps){
 
 }
 
+
+
+
+int sim_system::move_COM_pol( int pol_ind){
+//    double eold=calc_energy(M,size);
+    double eold = calc_total_energy();
+
+    double theta=acos(2*(drand48()-0.5));
+    double phi=2.0*M_PI*drand48();
+    double step = 0.5;
+    double dx   = step*sin(theta)*cos(phi);
+    double dy   = step*sin(theta)*sin(phi);
+    double dz   = step*cos(theta);
+
+    poly[pol_ind].displace_polymer(dx,dy,dz);
+
+    double enew = calc_total_energy();
+
+
+    double prob = exp((-enew+eold)/kT);
+    if(drand48() < prob){
+        return 1;}
+    else {
+        poly[pol_ind].displace_polymer(-dx,-dy,-dz);
+
+//        cout << "probability " << drand48() << " and "<< exp(-enew+eold) << "; E new = "<< enew << " ; E old = "<< eold << endl;
+        return 0;    }
+
+}
+
+int sim_system::move_pivot_pol( int pol_ind){
+//    double eold=calc_energy(M,size);
+    int mol_ind = 1+ (int)(drand48()*(double)(poly[pol_ind].N-1));
+    double eold = calc_total_energy();
+
+    double theta=acos(2*(drand48()-0.5));
+    double phi=2.0*M_PI*drand48();
+    molecule pivot = poly[pol_ind].M[mol_ind];
+    for (int i = mol_ind+1 ; i<poly[pol_ind].N; i++)
+    {
+        molecule turned = poly[pol_ind].M[i];
+        double rij = Distance(pivot,turned);
+        double phi_p = atan((turned.y-pivot.y)/(turned.x-pivot.x));
+        double theta_p = acos((turned.z-pivot.z)/rij);
+        double x   = rij*sin(theta+theta_p)*cos(phi+phi_p);
+        double y   = rij*sin(theta+theta_p)*sin(phi+phi_p);
+        double z   = rij*cos(theta+theta_p);
+        turned.move_to_position(x,y,z);
+    }
+
+    //keep COM constant; be careful to put it back when the move is rejected
+    double xc=poly[pol_ind].xc;
+    double yc=poly[pol_ind].yc;
+    double zc=poly[pol_ind].zc;
+
+    poly[pol_ind].update_COM();
+    poly[pol_ind].displace_polymer(xc-poly[pol_ind].xc,yc-poly[pol_ind].yc,zc-poly[pol_ind].zc);
+
+    double enew = calc_total_energy();
+
+
+    double prob = exp((-enew+eold)/kT);
+    if(drand48() < prob){
+        return 1;}
+    else {
+
+        for (int i = mol_ind+1 ; i<poly[pol_ind].N; i++)
+        {
+            molecule turned = poly[pol_ind].M[i];
+            double rij = Distance(pivot,turned);
+            double phi_p = atan((turned.y-pivot.y)/(turned.x-pivot.x));
+            double theta_p = acos((turned.z-pivot.z)/rij);
+            double x   = rij*sin(theta-theta_p)*cos(phi+phi_p);
+            double y   = rij*sin(theta-theta_p)*sin(phi+phi_p);
+            double z   = rij*cos(theta-theta_p);
+            turned.move_to_position(x,y,z);
+        }
+        poly[pol_ind].update_COM();
+
+//        cout << "probability " << drand48() << " and "<< exp(-enew+eold) << "; E new = "<< enew << " ; E old = "<< eold << endl;
+        return 0;    }
+
+}
 
 
 int sim_system::mc_step_pol( int pol_ind){
@@ -249,11 +415,16 @@ int sim_system::mc_step_pol( int pol_ind){
     double z1   = poly[pol_ind].M[mol_ind].z;
 
     poly[pol_ind].M[mol_ind].advance(1);
-//    cout << "\n\nmc step index = " << mol_ind <<endl;
-//    M[mol_ind].print();
-//    double enew=calc_energy(M,size);
-    double enew = recalc_energy_pol(pol_ind, mol_ind);
 
+    double Dxc  = (poly[pol_ind].M[mol_ind].x-x1)/poly[pol_ind].N;
+    double Dyc  = (poly[pol_ind].M[mol_ind].y-y1)/poly[pol_ind].N;
+    double Dzc  = (poly[pol_ind].M[mol_ind].z-z1)/poly[pol_ind].N;
+
+    poly[pol_ind].xc += Dxc;
+    poly[pol_ind].yc += Dyc;
+    poly[pol_ind].zc += Dzc;
+
+    double enew = recalc_energy_pol(pol_ind, mol_ind);
 
 
     double prob = exp((-enew+eold)/kT);
@@ -261,6 +432,10 @@ int sim_system::mc_step_pol( int pol_ind){
         return 1;}
     else {
         poly[pol_ind].M[mol_ind].move_to_position(x1,y1,z1);
+
+        poly[pol_ind].xc -= Dxc;
+        poly[pol_ind].yc -= Dyc;
+        poly[pol_ind].zc -= Dzc;
 //        cout << "probability " << drand48() << " and "<< exp(-enew+eold) << "; E new = "<< enew << " ; E old = "<< eold << endl;
         return 0;    }
 
@@ -268,24 +443,33 @@ int sim_system::mc_step_pol( int pol_ind){
 
 
 double sim_system::mc_steps_pol( int Nsteps){
-    int success=0;
+    int success1=0;
+    int success2=0;
+    int success3=0;
 
 //  for (int i=0;i<size;i++){
 //    cout <<  "\n\n mc_steps"  << endl;
 //    M[i].print();
 //  }
 
-    for (int i = 0; i < Nsteps; i++){
-        int index = (int)(drand48()*(double)(N_polymers));
+    for (int i = 0; i < Nsteps; i++)
+        {
+            int index = (int)(drand48()*(double)(N_polymers));
 //        cout <<  "index = "<<index << endl;
-        success += mc_step_pol( index);
+            if (drand48()<0.87){success1 += mc_step_pol( index);}
+            else if (drand48()>0.92) {success2 += move_pivot_pol( index);}
+            else {success3+=move_COM_pol( index);}
+
+        }
+
+    cout << "acceptances of moves: pivot = " << (double)success2/Nsteps/0.08 <<  " ; local = " << (double)success1/Nsteps/0.87 << " ; COM = " << (double)success3/Nsteps/0.05 << endl;
 //        if (success==1){
 ////            M[index].print();
 //            }
            // cout << "index = " <<index;
-    }
 
-    return (double)success/Nsteps;
+
+    return (double)(success1+success2+success3)/Nsteps;
 
 }
 
@@ -299,7 +483,7 @@ int sim_system::gnuplot(int j /*, char * file_format*/){
 
 	    ofstream positions_file1;
         char str1[80];
-        sprintf(str1, "/pos%d.dat",j);
+        sprintf(str1, "/pos%3.3d.dat",j);
 //        printf(str);
 	    positions_file1.open( (foldername+str1).c_str(), ofstream::out | ofstream::trunc );
 	    for(int i=0; i < N_molecules;i++){
@@ -310,7 +494,7 @@ int sim_system::gnuplot(int j /*, char * file_format*/){
 
 	    //ofstream positions_file2;
         char str2[80];
-        sprintf(str2, "/polymer_pos%d.pdb",j);
+        sprintf(str2, "/polymer_pos%3.3d.pdb",j);
 //        printf(str);
 	    //positions_file2.open( (foldername+str2).c_str(), ofstream::out | ofstream::trunc );
 	    FILE * positions_file2;
@@ -318,30 +502,30 @@ int sim_system::gnuplot(int j /*, char * file_format*/){
 	    int cnt = 1;
 	    fprintf(positions_file2,"REMARK polymer configuration in MC code\n");
 
-	    for(int i=0; i < 40;i++)
-	    {
-            for(int j=0; j < 30;j++)
-                {
-            //double theta=acos(2*(drand48()-0.5));
-            double theta=acos(-1.0+i*2.0/40.);
-            //double phi=M_PI*drand48();
-            double phi=M_PI*j*1.0/30.;
-            double x = 10*sin(theta)*cos(phi);
-            double y = 10*sin(theta)*sin(phi);
-            double z = 10*cos(theta);
-                //positions_file2 << poly[i].M[j].x << "  " << poly[i].M[j].y << "  " << poly[i].M[j].z << "  " << poly[i].id  << endl;
-            fprintf(positions_file2,"ATOM %6d%4s  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d \n",cnt, "FE",cnt-1,x,y,z , 10 );
-            cnt++;
+//	    for(int i=0; i < 20;i++)
+//	    {
+//            for(int kk=0; kk < 30;kk++)
+//                {
+//            //double theta=acos(2*(drand48()-0.5));
+//            double theta=acos(-1.0+i*2.0/20.);
+//            //double phi=M_PI*drand48();
+//            double phi=2.0*M_PI*kk*1.0/20.;
+//            double x = R*sin(theta)*cos(phi);
+//            double y = R*sin(theta)*sin(phi);
+//            double z = R*cos(theta);
+//                //positions_file2 << poly[i].M[j].x << "  " << poly[i].M[j].y << "  " << poly[i].M[j].z << "  " << poly[i].id  << endl;
+//            fprintf(positions_file2,"ATOM %6d%4s  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d \n",cnt, "FE",cnt-1,x,y,z , 10 );
+//            cnt++;
+//
+//	    }}
 
-	    }}
-
-	    	    for(int i=0; i < N_molecules;i++)
-	    {
-                //positions_file2 << poly[i].M[j].x << "  " << poly[i].M[j].y << "  " << poly[i].M[j].z << "  " << poly[i].id  << endl;
-            fprintf(positions_file2,"ATOM %6d%4s  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d \n",cnt, "FE",cnt-1,M[i].x,M[i].y,M[i].z , int(M[i].q/2.+1.0) );
-            cnt++;
-
-	    }
+//	    	    for(int i=0; i < N_molecules;i++)
+//	    {
+//                //positions_file2 << poly[i].M[j].x << "  " << poly[i].M[j].y << "  " << poly[i].M[j].z << "  " << poly[i].id  << endl;
+//            fprintf(positions_file2,"ATOM %6d%4s  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d \n",cnt, "FE",cnt-1,M[i].x,M[i].y,M[i].z , int(M[i].q+1.0) );
+//            cnt++;
+//
+//	    }
 
 	    for(int i=0; i < N_polymers; i++)
 	    {
@@ -368,8 +552,8 @@ int sim_system::gnuplot(int j /*, char * file_format*/){
 	fprintf(gnuplotPipe, "set pointsize 1; \n" );
 	fprintf(gnuplotPipe, "set ticslevel 0 \n" );
 	fprintf(gnuplotPipe, "set title 'Graph #%d'; set pointsize 0.5; set view equal xyz; \n set palette rgb 33,13,10; \n",j);
-	fprintf(gnuplotPipe, "splot '%s' u 1:2:3:4 w p palette pointtype 7  ps 1.,\\\n", (foldername+str1).c_str());
-	fprintf(gnuplotPipe, "'%s' u 1:2:3:4 w p palette pt 7 ps 4.0, '' u 1:2:3 w p  pt 6 lc rgb 'gray' lt 2 ps 4.0  \n", (foldername+str2).c_str());
+//	fprintf(gnuplotPipe, "splot '%s' u 1:2:3:4 w p palette pointtype 7  ps 1.,\\\n", (foldername+str1).c_str());
+	fprintf(gnuplotPipe, "splot '%s' u 7:8:9:6 w lp palette pt 7 ps 2.0, '' u 7:8:9 w p  pt 6 lc rgb 'gray' lt 2 ps 4.0  \n", (foldername+str2).c_str());
     pclose(gnuplotPipe);
     return 0;
 }
@@ -384,4 +568,5 @@ sim_system::~sim_system()
 //        delete mol_list[i];
 //    }
     delete[] mol_list;
+    delete[] dd.linked_list;
 }

@@ -16,12 +16,12 @@ using namespace std;
 
 polymer::polymer()
 {
-    N = 20;
+    N = 50;
     M = new molecule [N];
 //    molecule m2[N];
 //    M = m1 ;//ctor
-    delta = 1.0;
-    k = 20.;
+    delta = 0.1;
+    k = 200.;
     pol_id++;
     id = pol_id;
     cout << "\ninit polymer ..." << endl;
@@ -30,7 +30,7 @@ polymer::polymer()
     xc=yc=zc=0;
     for (int i = 0; i < N; i++){
 //        M[i] = molecule();
-        M[i].q=-1.0;
+        M[i].q = 0.;
         M[i].type=1;
         //center of mass initialization
         xc+=M[i].x; yc+=M[i].y ; zc+=M[i].z;
@@ -46,8 +46,8 @@ polymer::polymer(int Nset /*double q , other parameters can be included to set u
     M = new molecule [N];
 //    molecule m2[N];
 //    M = m1 ;//ctor
-    delta = 1.0;
-    k = 20.;
+    delta = 0.1;
+    k = 200.;
     pol_id++;
     id = pol_id;
     cout << "\ninit polymer ..." << endl;
@@ -56,7 +56,7 @@ polymer::polymer(int Nset /*double q , other parameters can be included to set u
     xc=yc=zc=0;
     for (int i = 0; i < N; i++){
 //        M[i] = molecule();
-        M[i].q=-1.0;
+        M[i].q=0.0;
         M[i].type=1;
         //center of mass initialization
         xc+=M[i].x; yc+=M[i].y ; zc+=M[i].z;
@@ -67,13 +67,29 @@ polymer::polymer(int Nset /*double q , other parameters can be included to set u
 }
 
 
+double polymer::mindist( )
+{
+
+    double min_dist=lj_sigma*2.;
+    for (int i = 0; i < N-1; ++i)
+    {
+        for (int j = i+1; j < N; ++j)
+        {
+            double r_ij = Distance(M[i],M[j]);
+            if (r_ij<min_dist){min_dist = r_ij;}
+        }
+    }
+    //cout << "Minimal distance between monomers = " <<min_dist << endl;
+    return min_dist;
+}
+
 // function to create polymer by random walk... to be done. DONE!
 void polymer::polymer_RW( /* int Nset  = 10 , */ double r /* = 0.0 */)
 {
 
     // delta is the spring length
-    delta = 1.0;
-    k = 20.;
+    delta = 0.1;
+    k = 200.;
 
 
     double theta=acos(2*(drand48()-0.5));
@@ -92,6 +108,122 @@ void polymer::polymer_RW( /* int Nset  = 10 , */ double r /* = 0.0 */)
     }
 
 }
+
+void polymer::polymer_RW_WI( double x, double y, double z)
+{
+
+    // delta is the spring length
+    delta = 0.1;
+    k = 200.;
+
+    M[0].move_to_position(x,y,z);
+    double min_dist = 0.0;
+
+    while (min_dist<0.045)
+    {
+        for (int i = 1; i < N; ++i)
+        {
+
+            M[i].move_to_position(M[i-1]);
+            M[i].advance(1,delta);
+        }
+
+        polymer::update_COM();
+
+        polymer::displace_polymer(x-xc,y-yc,z-zc);
+
+        min_dist = polymer::mindist( );
+    }
+}
+
+void polymer::polymer_SAW( double x, double y, double z)
+{
+
+    // delta is the spring length
+    delta = 0.1;
+    k = 200.;
+
+    M[0].move_to_position(x,y,z);
+    double min_dist = 0.0;
+    M[1].move_to_position(M[0]);
+    M[1].advance(1,delta*1.12);
+
+    for (int i = 2; i < N; ++i)
+    {
+        min_dist = 0.1;
+        while (min_dist<0.13)
+        {
+            min_dist = 0.14;
+            M[i].move_to_position(M[i-1]);
+            M[i].advance(1,delta*1.12);
+            //check self-avoidance with previous molecules
+            for (int j=0; j<i-1; j++)
+            {
+                double r_ij = Distance(M[i],M[j]);
+                if (r_ij<min_dist){min_dist = r_ij;}
+            }
+        }
+    }
+
+        polymer::update_COM();
+
+        polymer::displace_polymer(x-xc,y-yc,z-zc);
+
+        min_dist = polymer::mindist( );
+        cout << "Mindist = "<<min_dist << endl;
+
+
+}
+
+void polymer::displace_polymer( double x, double y, double z)
+{
+    for (int i = 0; i < N; ++i)
+    {
+
+        M[i].x+=x;
+        M[i].y+=y;
+        M[i].z+=z;
+    }
+    xc+=x; yc+=y ; zc+=z;
+}
+
+
+//void polymer::inertia( double x, double y, double z)
+//{
+//    for (int i = 0; i < N; ++i)
+//    {
+//
+//        M[i].x+=x;
+//        M[i].y+=y;
+//        M[i].z+=z;
+//    }
+//    xc+=x; yc+=y ; zc+=z;
+//}
+
+void polymer::polymer_RW( double x, double y, double z)
+{
+
+    // delta is the spring length
+    delta = 0.1;
+    k = 200.;
+
+    M[0].move_to_position(x,y,z);
+
+
+    for (int i = 1; i < N; ++i)
+    {
+
+        M[i].move_to_position(M[i-1]);
+        M[i].advance(1,delta);
+    }
+
+    polymer::update_COM();
+
+    polymer::displace_polymer(x-xc,y-yc,z-zc);
+
+
+}
+
 
 void polymer::update_COM()
 {
@@ -167,7 +299,7 @@ void polymer::print(){
     for (int i = 0; i < N; ++i)
     {
         /* print all molecules */
-        M[i].print();
+        //M[i].print();
     }
     cout << " Polymer printed ..." << endl;
 }
