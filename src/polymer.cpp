@@ -16,7 +16,7 @@ using namespace std;
 
 polymer::polymer()
 {
-    N = 50;
+    N = 200;
     M = new molecule [N];
 //    molecule m2[N];
 //    M = m1 ;//ctor

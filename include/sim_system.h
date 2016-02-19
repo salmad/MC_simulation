@@ -2,7 +2,9 @@
 #define SIM_SYSTEM_H
 #include "../molecule.h"
 #include "polymer.h"
+#include <vector>
 
+using namespace std;
 #define MAX_PART 5000
 
 class sim_system
@@ -26,7 +28,7 @@ class sim_system
         {
             int ncells;
             int ** cell_neighbors;
-            int * hoc;
+            int  hoc[200];
             int * linked_list;
             double cell_size;
         } ;
@@ -50,8 +52,10 @@ class sim_system
 
         int mc_step_mol( int );
         double mc_steps_mol( int );
+
         int mc_step_pol( int );
         double mc_steps_pol( int );
+        double mc_steps_pol_ll( int );
 
         int gnuplot(int j);
 

@@ -44,11 +44,11 @@ sim_system::sim_system()
     //cells initialization
 
     dd.ncells = 1;
-    dd.hoc = NULL;
-    dd.cell_neighbors= NULL;
+//    dd.hoc   ;
+    dd.cell_neighbors=NULL;
     dd.linked_list = new int  [MAX_PART];
     dd.cell_size = 1.0;
-    memset(dd.linked_list, 0, sizeof(dd.linked_list));
+    memset(dd.linked_list, -1, sizeof(dd.linked_list));
 
     //bond_list;
     //verlet_lsit;
@@ -61,12 +61,13 @@ void sim_system::create1D_linked_list()
     double z_range = 2*(R+2);
     dd.ncells = int(z_range/lj_sigma);
     dd.cell_size = z_range/int(z_range/lj_sigma);
-    cout << "cell size = "<<dd.cell_size << " ncells =" << dd.ncells<< endl;
 
     //set head of chains to zero
+
+    memset( dd.hoc, 0, 200*sizeof(int) );
     for (int i=0; i<dd.ncells; i++)
     {
-        dd.hoc[i]=0;
+        dd.hoc[i]=-1;// -1 means nothing is there
     }
 
     // fill arrays with particles
@@ -74,36 +75,89 @@ void sim_system::create1D_linked_list()
     {
         molecule m1 = *mol_list[i];
         int icell = ((m1.z+z_range/2.)/dd.cell_size);
-         cout << "icell = "<< icell << " m.z =" << m1.z<< endl;
+
         if (icell > 0 && icell<dd.ncells )
         {
             dd.linked_list[i] = dd.hoc[icell];
             dd.hoc[icell] = i;
+
         }
+
     }
 
-    //create neighbor list : to be done
-//    dom_decomposition.cell_neighbors = new int * [dom_decomposition.ncells ];
 
+
+    //create neighbor list : to be done
+//    dd.cell_neighbors = new int * ;
+//    int neighbors[dd.ncells][3];
+//    memset( neighbors, -1, dd.ncells*3*sizeof(int) );
+//    cout << "neighbor of cell " << 0 << " is cell <<" << neighbors <<endl;
+//    for (int i = 0; i<dd.ncells ; i++)
+//    {
+//        if (i==0) {neighbors[i][0] = i;neighbors[i][1] = i+1; }
+//        else if (i==dd.ncells-1) {neighbors[i][0] = i-1;neighbors[i][1] = i;}
+//        else {neighbors[i][0] = i-1;neighbors[i][1] = i;neighbors[i][2] = i+1;}
+//        cout << "neighbor of cell " << i << " is cell " << neighbors[i][0] <<endl;
+//    }
+//    dd.cell_neighbors = neighbors;
 }
 
 //energy using cell list
 double sim_system::recalc_energy_pol_ll(int pol_i, int mol_i)
 {
-    double e    = 0.0;
-    molecule m1 = (poly[pol_i].M[mol_i]);
-    int icell   = int
+    double e        = 0.0;
+    molecule m1     = poly[pol_i].M[mol_i];
+    int id1         = poly[pol_i].M[mol_i].id;
+    double z_range  = dd.ncells*dd.cell_size;
+    int icell       = ((m1.z+z_range/2.)/dd.cell_size);
     // calculate non-bonded part
 
-    for (int j = 0; j < max_part_id; j++){
-        molecule m2 = *mol_list[j];
-        if(m1.id != m2.id){
+    //run through neigbouring cells
+    if (icell>0)
+    {
+        int jcell = icell-1; //neighboring cell
+        int id2 = dd.hoc[jcell]; //take the hoc of cell
 
-        //coulomb interaction
-        //e += electrostatic_energy(m1,m2);
-        //Lennard-jones
-        e += lj_energy(m1,m2);
+        while (id2 != -1)
+        {
+            if(id1!=id2)
+            {
+                molecule m2 = *mol_list[id2];
+                 e += lj_energy(m1,m2);
+            }
+            id2 = dd.linked_list[id2];
+
         }
+
+    }
+
+    if (icell<dd.ncells && icell>0)
+    {
+        int jcell = icell+1; //neighboring cell
+        int id2 = dd.hoc[jcell]; //take the hoc of cell
+        while (id2 != -1)
+        {
+            if(id1!=id2)
+            {
+                molecule m2 = *mol_list[id2];
+                 e += lj_energy(m1,m2);
+            }
+            id2 = dd.linked_list[id2];
+        }
+
+    }
+
+
+    int jcell = icell; //neighboring cell
+    int id2 = dd.hoc[jcell]; //take the hoc of cell
+    while (id2 != -1)
+    {
+        if(id1!=id2)
+        {
+            molecule m2 = *mol_list[id2];
+            e += lj_energy(m1,m2);
+        }
+        id2 = dd.linked_list[id2];
     }
 
     // go through bonded ... to be done
@@ -410,6 +464,9 @@ int sim_system::mc_step_pol( int pol_ind){
     int mol_ind = (int)(drand48()*(double)(poly[pol_ind].N));
     double eold = recalc_energy_pol(pol_ind,mol_ind);
 
+    eold = recalc_energy_pol(pol_ind,mol_ind);
+
+
     double x1   = poly[pol_ind].M[mol_ind].x;
     double y1   = poly[pol_ind].M[mol_ind].y;
     double z1   = poly[pol_ind].M[mol_ind].z;
@@ -424,7 +481,7 @@ int sim_system::mc_step_pol( int pol_ind){
     poly[pol_ind].yc += Dyc;
     poly[pol_ind].zc += Dzc;
 
-    double enew = recalc_energy_pol(pol_ind, mol_ind);
+    double enew = recalc_energy_pol_ll(pol_ind, mol_ind);
 
 
     double prob = exp((-enew+eold)/kT);
@@ -456,7 +513,7 @@ double sim_system::mc_steps_pol( int Nsteps){
         {
             int index = (int)(drand48()*(double)(N_polymers));
 //        cout <<  "index = "<<index << endl;
-            if (drand48()<0.87){success1 += mc_step_pol( index);}
+            if (drand48()<1.){success1 += mc_step_pol( index);}
             else if (drand48()>0.92) {success2 += move_pivot_pol( index);}
             else {success3+=move_COM_pol( index);}
 
@@ -473,6 +530,20 @@ double sim_system::mc_steps_pol( int Nsteps){
 
 }
 
+
+
+double sim_system::mc_steps_pol_ll( int Nsteps){
+    int success = 0;
+    for (int i = 0; i < Nsteps; i++)
+    {
+        create1D_linked_list();
+        int index = (int)(drand48()*(double)(N_polymers));
+        success += mc_step_pol( index);
+     }
+
+    return (double)(success)/Nsteps;
+
+}
 
 
 
