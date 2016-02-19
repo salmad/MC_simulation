@@ -169,11 +169,11 @@
 	"../global.h"
 	"polymer.h"
 
-<<<<<<< HEAD
-1455891900 source:/home/salim/Documents/MC_simulation/main.cpp
-=======
+1455875540 D
+
 1455878865 source:/home/salim/Documents/MC_simulation/main.cpp
->>>>>>> bb653749848eb675df987098fe44936bbb6aef03
+
+1455878865 53749848eb675df987098fe44936bbb6aef03
 	<vector>
 	<cstdlib>
 	<iomanip>
@@ -190,6 +190,23 @@
 	"include/integrate.h"
 	"include/polymer.h"
 	"include/sim_system.h"
+	"../include/sim_system.h"
+	"../global.h"
+	"../molecule.h"
+	"../include/polymer.h"
+	"../include/integrate.h"
+	<vector>
+	<cstdlib>
+	<iomanip>
+	<ctime>
+	<cmath>
+	<string>
+	<cstring>
+	<sys/stat.h>
+	<iostream>
+	<fstream>
+	<stdio.h>
+	<stdlib.h>
 
 1455850350 /home/salim/Documents/MC_simulation/include/sim_system.h
 	"../molecule.h"
@@ -220,8 +237,7 @@
 	<cmath>
 	<fstream>
 
-<<<<<<< HEAD
-1455891780 source:/home/salim/Documents/MC_simulation/src/sim_system.cpp
+1455878865 source:/home/salim/Documents/MC_simulation/src/sim_system.cpp
 	"../include/sim_system.h"
 	"../global.h"
 	"../molecule.h"
@@ -323,9 +339,90 @@
 	<fstream>
 
 1455914027 source:/home/salim/MEGA/MC_simulation/src/sim_system.cpp
-=======
-1455878865 source:/home/salim/Documents/MC_simulation/src/sim_system.cpp
->>>>>>> bb653749848eb675df987098fe44936bbb6aef03
+
+1455920719 source:/home/salim/Desktop/MC_simulation/integrate.cpp
+	"molecule.h"
+	"global.h"
+	"include/polymer.h"
+	"include/integrate.h"
+	<vector>
+	<cstdlib>
+	<iomanip>
+	<ctime>
+	<cmath>
+	<string>
+	<sys/stat.h>
+	<iostream>
+	<fstream>
+	<stdio.h>
+	<stdlib.h>
+
+1455919750 /home/salim/Desktop/MC_simulation/molecule.h
+	"global.h"
+
+1455919750 /home/salim/Desktop/MC_simulation/global.h
+	<string>
+	<stdio.h>
+	<stdlib.h>
+	<cmath>
+
+1455919750 /home/salim/Desktop/MC_simulation/include/polymer.h
+	"../molecule.h"
+	"../global.h"
+
+1455919750 /home/salim/Desktop/MC_simulation/include/integrate.h
+	"../molecule.h"
+	"../global.h"
+	"polymer.h"
+
+1455925752 source:/home/salim/Desktop/MC_simulation/main.cpp
+	<vector>
+	<cstdlib>
+	<iomanip>
+	<ctime>
+	<cmath>
+	<string>
+	<sys/stat.h>
+	<iostream>
+	<fstream>
+	<stdio.h>
+	<stdlib.h>
+	"molecule.h"
+	"global.h"
+	"include/integrate.h"
+	"include/polymer.h"
+	"include/sim_system.h"
+
+1455923448 /home/salim/Desktop/MC_simulation/include/sim_system.h
+	"../molecule.h"
+	"polymer.h"
+	<vector>
+
+1455920741 source:/home/salim/Desktop/MC_simulation/src/molecule.cpp
+	"../molecule.h"
+	"../global.h"
+	<vector>
+	<cstdlib>
+	<iomanip>
+	<ctime>
+	<cmath>
+	<iostream>
+	<fstream>
+
+1455925375 source:/home/salim/Desktop/MC_simulation/src/polymer.cpp
+	"../include/polymer.h"
+	"../molecule.h"
+	"../include/integrate.h"
+	"../global.h"
+	<iostream>
+	<vector>
+	<cstdlib>
+	<iomanip>
+	<ctime>
+	<cmath>
+	<fstream>
+
+1455925113 source:/home/salim/Desktop/MC_simulation/src/sim_system.cpp
 	"../include/sim_system.h"
 	"../global.h"
 	"../molecule.h"

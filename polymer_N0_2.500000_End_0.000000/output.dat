@@ -6,37 +6,26 @@
 Computer simulation
 	Simulation parameters: 
 		Bjerrum length = 0.7 nm
-<<<<<<< HEAD
-		Box size = 20 nm; Droplet volume =  28730.9 nm^3 ;
-		Number of particles = 2; Concentration = 6.96114e-05 nm^-3 ; 0.000116019M
+		Box size = 10 nm; Droplet volume =  4188.79 nm^3 ;
+		Number of particles = 2; Concentration = 0.000477465 nm^-3 ; 0.000795775M
 		Time step = 0.25 s
-		Screening length = 1633.1 nm
-		 kR = 0.0116343
-=======
-		Box size = 20 nm; Droplet volume =  113.097 nm^3 ;
-		Number of particles = 0; Concentration = 0 nm^-3 ; 0M
-		Time step = 0.25 s
-		Screening length = inf nm
-		 kR = 0
->>>>>>> bb653749848eb675df987098fe44936bbb6aef03
+		Screening length = 238.095 nm
+		 kR = 0.042
 	 LJ Interaction parameters: 
  		 anion-surface eps = 4; sigma = 0.1; rcut = 0.2; roff = 0.05; shift = 0.00407922
  		 cation-surface eps = 0.05; sigma = 0.1; rcut = 0.3; roff = 0; shift = 0.25
  		 cation-anion eps = 0.05; sigma = 0.1; rcut = 0.3; roff = 0; shift = 0
 	Setting ionic properties...
-<<<<<<< HEAD
 0
 
- ID = 0;  Molecule type = 0 ; q = 0; Radius = 12.9177
- x = 12.6757; y = 1.58086; z =  -1.92248
+ ID = 0;  Molecule type = 0 ; q = 0; Radius = 9.05313
+ x = 8.6539; y = 2.11965; z =  1.60507
  LJ parameters: sigma = 0.2; eps = 4
 1
 
- ID = 1;  Molecule type = 0 ; q = 0; Radius = 16.1462
- x = 9.20727; y = -5.73732; z =  11.9587
+ ID = 1;  Molecule type = 0 ; q = 0; Radius = 5.38591
+ x = 0.49572; y = 0.477782; z =  5.34173
  LJ parameters: sigma = 0.3; eps = 0.05
-=======
->>>>>>> bb653749848eb675df987098fe44936bbb6aef03
 
 init polymer ...
 
@@ -45,34 +34,19 @@ init polymer ...
 0
 from system print
 
- Print polymer ID 1 ; COM : x = 0.1 y = 0.1 z = 0.1
-<<<<<<< HEAD
- N = 100 ;  
-=======
- N = 50 ;  
->>>>>>> bb653749848eb675df987098fe44936bbb6aef03
+ Print polymer ID 1 ; COM : x = 10.1 y = 10.1 z = 10.1
+ N = 20 ;  
  Polymer printed ...
 1
 from system print
 
- Print polymer ID 2 ; COM : x = 0.1 y = 0.1 z = 0.1
-<<<<<<< HEAD
- N = 100 ;  
+ Print polymer ID 2 ; COM : x = 10.1 y = 10.1 z = 10.1
+ N = 20 ;  
  Polymer printed ...
  ## Creating molecules list ... 
 Molecule list created. max molecule id= 1 ; Nmol = 2
  ## Creating polymers list ... 
- 	 polymer number  #0 with 100 molecules
-=======
- N = 50 ;  
- Polymer printed ...
- ## Creating molecules list ... 
-Molecule list created. number of simple molecules = 0 ; Nmol = 0
- ## Creating polymers list ... 
- 	 polymer number  #0 with 50 molecules
-mol_list = 0
-mol_list = 1
->>>>>>> bb653749848eb675df987098fe44936bbb6aef03
+ 	 polymer number  #0 with 20 molecules
 mol_list = 2
 mol_list = 3
 mol_list = 4
@@ -93,6 +67,7 @@ mol_list = 18
 mol_list = 19
 mol_list = 20
 mol_list = 21
+ 	 polymer number  #1 with 20 molecules
 mol_list = 22
 mol_list = 23
 mol_list = 24
@@ -113,263 +88,45 @@ mol_list = 38
 mol_list = 39
 mol_list = 40
 mol_list = 41
-mol_list = 42
-mol_list = 43
-mol_list = 44
-mol_list = 45
-mol_list = 46
-mol_list = 47
-mol_list = 48
-mol_list = 49
-<<<<<<< HEAD
-=======
- 	 polymer number  #1 with 50 molecules
->>>>>>> bb653749848eb675df987098fe44936bbb6aef03
-mol_list = 50
-mol_list = 51
-mol_list = 52
-mol_list = 53
-mol_list = 54
-mol_list = 55
-mol_list = 56
-mol_list = 57
-mol_list = 58
-mol_list = 59
-mol_list = 60
-mol_list = 61
-mol_list = 62
-mol_list = 63
-mol_list = 64
-mol_list = 65
-mol_list = 66
-mol_list = 67
-mol_list = 68
-mol_list = 69
-mol_list = 70
-mol_list = 71
-mol_list = 72
-mol_list = 73
-mol_list = 74
-mol_list = 75
-mol_list = 76
-mol_list = 77
-mol_list = 78
-mol_list = 79
-mol_list = 80
-mol_list = 81
-mol_list = 82
-mol_list = 83
-mol_list = 84
-mol_list = 85
-mol_list = 86
-mol_list = 87
-mol_list = 88
-mol_list = 89
-mol_list = 90
-mol_list = 91
-mol_list = 92
-mol_list = 93
-mol_list = 94
-mol_list = 95
-mol_list = 96
-mol_list = 97
-mol_list = 98
-mol_list = 99
-<<<<<<< HEAD
-mol_list = 100
-mol_list = 101
- 	 polymer number  #1 with 100 molecules
-mol_list = 102
-mol_list = 103
-mol_list = 104
-mol_list = 105
-mol_list = 106
-mol_list = 107
-mol_list = 108
-mol_list = 109
-mol_list = 110
-mol_list = 111
-mol_list = 112
-mol_list = 113
-mol_list = 114
-mol_list = 115
-mol_list = 116
-mol_list = 117
-mol_list = 118
-mol_list = 119
-mol_list = 120
-mol_list = 121
-mol_list = 122
-mol_list = 123
-mol_list = 124
-mol_list = 125
-mol_list = 126
-mol_list = 127
-mol_list = 128
-mol_list = 129
-mol_list = 130
-mol_list = 131
-mol_list = 132
-mol_list = 133
-mol_list = 134
-mol_list = 135
-mol_list = 136
-mol_list = 137
-mol_list = 138
-mol_list = 139
-mol_list = 140
-mol_list = 141
-mol_list = 142
-mol_list = 143
-mol_list = 144
-mol_list = 145
-mol_list = 146
-mol_list = 147
-mol_list = 148
-mol_list = 149
-mol_list = 150
-mol_list = 151
-mol_list = 152
-mol_list = 153
-mol_list = 154
-mol_list = 155
-mol_list = 156
-mol_list = 157
-mol_list = 158
-mol_list = 159
-mol_list = 160
-mol_list = 161
-mol_list = 162
-mol_list = 163
-mol_list = 164
-mol_list = 165
-mol_list = 166
-mol_list = 167
-mol_list = 168
-mol_list = 169
-mol_list = 170
-mol_list = 171
-mol_list = 172
-mol_list = 173
-mol_list = 174
-mol_list = 175
-mol_list = 176
-mol_list = 177
-mol_list = 178
-mol_list = 179
-mol_list = 180
-mol_list = 181
-mol_list = 182
-mol_list = 183
-mol_list = 184
-mol_list = 185
-mol_list = 186
-mol_list = 187
-mol_list = 188
-mol_list = 189
-mol_list = 190
-mol_list = 191
-mol_list = 192
-mol_list = 193
-mol_list = 194
-mol_list = 195
-mol_list = 196
-mol_list = 197
-mol_list = 198
-mol_list = 199
-mol_list = 200
-mol_list = 201
- List created. max_part_id = 201
+ List created. max_part_id = 41
 		Returning molecule ... 
 		 number of returned molecules = 0
 	Warming steps:
 	Hello
-acceptances of moves: pivot = 0.0414286 ; local = 0.26069 ; COM = 0.438
+acceptances of moves: pivot = 0 ; local = 0.510575 ; COM = 0
 		Returning molecule ... 
 		 number of returned molecules = 0
 Main simulation steps:
-nsteps 10000 ntimes= 3000
+nsteps 10000 ntimes= 500
 i = 0
 Mindist = 0.112
 Mindist = 0.112
-acceptances of moves: pivot = 0.0619048 ; local = 0.280843 ; COM = 0.606667
- ;energy = 149.434 ;acceptance= 0.279
-acceptances of moves: pivot = 0.08 ; local = 0.313793 ; COM = 0.706
-time: 7.89457 sec
-		 completion = 0% ; ; Rad = 1.77127 ; 10.1623; Etot = 200.697 ;z = 2.5 ;<z> = 0.089624 ; -0.118208
- ;energy = 200.697 ;acceptance= 0.3139
-acceptances of moves: pivot = 0.0914286 ; local = 0.324828 ; COM = 0.708
- ;energy = 163.776 ;acceptance= 0.3244
-acceptances of moves: pivot = 0.0814286 ; local = 0.309425 ; COM = 0.756
- ;energy = 175.598 ;acceptance= 0.3127
-acceptances of moves: pivot = 0.0928571 ; local = 0.311494 ; COM = 0.746
- ;energy = 204.15 ;acceptance= 0.3148
-acceptances of moves: pivot = 0.105714 ; local = 0.298736 ; COM = 0.77
- ;energy = 180.06 ;acceptance= 0.3058
-acceptances of moves: pivot = 0.0842857 ; local = 0.316437 ; COM = 0.758
- ;energy = 173.355 ;acceptance= 0.3191
-acceptances of moves: pivot = 0.07 ; local = 0.321494 ; COM = 0.742
- ;energy = 200.397 ;acceptance= 0.3217
-acceptances of moves: pivot = 0.0771429 ; local = 0.315632 ; COM = 0.798
- ;energy = 171.758 ;acceptance= 0.3199
-acceptances of moves: pivot = 0.104286 ; local = 0.305057 ; COM = 0.722
- ;energy = 161.582 ;acceptance= 0.3088
-acceptances of moves: pivot = 0.08 ; local = 0.301609 ; COM = 0.788
- ;energy = 165.231 ;acceptance= 0.3074
-acceptances of moves: pivot = 0.0985714 ; local = 0.311379 ; COM = 0.734
- ;energy = 175.303 ;acceptance= 0.3145
-acceptances of moves: pivot = 0.07 ; local = 0.307586 ; COM = 0.778
- ;energy = 151.839 ;acceptance= 0.3114
-acceptances of moves: pivot = 0.1 ; local = 0.317471 ; COM = 0.782
- ;energy = 198.021 ;acceptance= 0.3223
-acceptances of moves: pivot = 0.0757143 ; local = 0.31931 ; COM = 0.822
- ;energy = 179.315 ;acceptance= 0.3242
-acceptances of moves: pivot = 0.0828571 ; local = 0.324828 ; COM = 0.764
- ;energy = 201.6 ;acceptance= 0.3266
-acceptances of moves: pivot = 0.117143 ; local = 0.315172 ; COM = 0.746
- ;energy = 192.624 ;acceptance= 0.3197
-acceptances of moves: pivot = 0.08 ; local = 0.325172 ; COM = 0.75
- ;energy = 185.273 ;acceptance= 0.326
-acceptances of moves: pivot = 0.0885714 ; local = 0.314713 ; COM = 0.762
- ;energy = 193.302 ;acceptance= 0.3181
-acceptances of moves: pivot = 0.0914286 ; local = 0.312529 ; COM = 0.806
- ;energy = 200.588 ;acceptance= 0.3186
-acceptances of moves: pivot = 0.104286 ; local = 0.316667 ; COM = 0.724
- ;energy = 182.224 ;acceptance= 0.319
-acceptances of moves: pivot = 0.0842857 ; local = 0.312069 ; COM = 0.726
- ;energy = 145.778 ;acceptance= 0.3137
-acceptances of moves: pivot = 0.0871429 ; local = 0.310345 ; COM = 0.754
- ;energy = 172.62 ;acceptance= 0.3138
-acceptances of moves: pivot = 0.102857 ; local = 0.333103 ; COM = 0.776
- ;energy = 171.307 ;acceptance= 0.3358
-acceptances of moves: pivot = 0.08 ; local = 0.306552 ; COM = 0.796
- ;energy = 178.068 ;acceptance= 0.3121
-acceptances of moves: pivot = 0.0742857 ; local = 0.320345 ; COM = 0.708
- ;energy = 190.318 ;acceptance= 0.3193
-acceptances of moves: pivot = 0.0828571 ; local = 0.302069 ; COM = 0.79
- ;energy = 197.172 ;acceptance= 0.3081
-acceptances of moves: pivot = 0.0785714 ; local = 0.313678 ; COM = 0.762
- ;energy = 208.529 ;acceptance= 0.3165
-acceptances of moves: pivot = 0.0642857 ; local = 0.315287 ; COM = 0.79
- ;energy = 182.404 ;acceptance= 0.3183
-acceptances of moves: pivot = 0.107143 ; local = 0.315977 ; COM = 0.73
- ;energy = 174.32 ;acceptance= 0.3189
-acceptances of moves: pivot = 0.0757143 ; local = 0.317816 ; COM = 0.794
- ;energy = 181.254 ;acceptance= 0.3215
-acceptances of moves: pivot = 0.134286 ; local = 0.319655 ; COM = 0.7
-time: 103.916 sec
-		 completion = 1% ; ; Rad = 5.60788 ; 5.76928; Etot = 182.252 ;z = 2.5 ;<z> = 0.122591 ; 0.141014
- ;energy = 191.36 ;acceptance= 0.3225
-acceptances of moves: pivot = 0.0914286 ; local = 0.324828 ; COM = 0.74
- ;energy = 181.934 ;acceptance= 0.326
-=======
- List created. max_part_id = 100
-		Returning molecule ... 
-		 number of returned molecules = 0
-	Warming steps:
-acceptances of moves: pivot = 0 ; local = 0.14908 ; COM = 0
-		Returning molecule ... 
-		 number of returned molecules = 0
-Main simulation steps:
-acceptances of moves: pivot = 0 ; local = 0.267161 ; COM = 0
->>>>>>> bb653749848eb675df987098fe44936bbb6aef03
+acceptances of moves: pivot = 0 ; local = 0.524904 ; COM = 0
+ ;energy = 7.03653e+06 ;acceptance= 0.456667
+acceptances of moves: pivot = 0 ; local = 0.489425 ; COM = 0
+time: 0.6791 sec
+		 completion = 0% ; ; Rad = 0.192334 ; 1.57011; Etot = 994.1 ;z = 2.5 ;<z> = -6.19027 ; 2.36476
+ ;energy = 994.1 ;acceptance= 0.4258
+acceptances of moves: pivot = 0 ; local = 0.479195 ; COM = 0
+ ;energy = 324.361 ;acceptance= 0.4169
+acceptances of moves: pivot = 0 ; local = 0.467011 ; COM = 0
+ ;energy = 542.197 ;acceptance= 0.4063
+acceptances of moves: pivot = 0 ; local = 0.505862 ; COM = 0
+ ;energy = 91.5646 ;acceptance= 0.4401
+acceptances of moves: pivot = 0 ; local = 0.503563 ; COM = 0
+ ;energy = 1804.43 ;acceptance= 0.4381
+acceptances of moves: pivot = 0 ; local = 0.497241 ; COM = 0
+time: 2.14897 sec
+		 completion = 1% ; ; Rad = 0.600616 ; 0.690367; Etot = 634.314 ;z = 2.5 ;<z> = -4.93973 ; 4.7265
+ ;energy = 49.2323 ;acceptance= 0.4326
+acceptances of moves: pivot = 0 ; local = 0.512989 ; COM = 0
+ ;energy = 722253 ;acceptance= 0.4463
+acceptances of moves: pivot = 0 ; local = 0.503563 ; COM = 0
+ ;energy = 2.49656e+07 ;acceptance= 0.4381
+acceptances of moves: pivot = 0 ; local = 0.496667 ; COM = 0
+ ;energy = 58.5331 ;acceptance= 0.4321
+acceptances of moves: pivot = 0 ; local = 0.515977 ; COM = 0
+ ;energy = 141.369 ;acceptance= 0.4489
+acceptances of moves: pivot = 0 ; local = 0.522529 ; COM = 0
+time: 3.61963 sec
+		 completion = 2% ; ; Rad = 0.511004 ; 0.595891; Etot = 2.33563e+06 ;z = 2.5 ;<z> = -4.86918 ; 4.89364

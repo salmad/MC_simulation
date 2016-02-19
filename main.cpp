@@ -24,9 +24,9 @@ extern string foldername="polymer_";
 const double time_step = 0.25;
 const int nbins=150;
 //Droplet size
-const int geometry=1;  // 0 if cubic , 1 if spherical
-const double L = 20.; // Nanometers
-const double R = 19.0;
+const int geometry=0;  // 0 if cubic , 1 if spherical
+const double L = 10.; // Nanometers
+const double R = 10.0;
 const double V=4./3.*M_PI*pow(R,3); // for sphere 4./3.*M_PI*pow(L-2.0,3)
 //const double V=pow(L,3);
 //Electrostatic parameter
@@ -50,7 +50,7 @@ const double lj_shift_cations=0.25;
 const double kT=1.0;
 const double lambda=10.0;
 double k=2.0;
-double disntance_between_COM = 3.0;
+double disntance_between_COM = 2.0;
 double n0=2.5;
 double n_end=0.0;
 
@@ -224,7 +224,7 @@ int main(int argc, char* argv[]) {
 
 ///////////////////////////////////////////////////////////////////////////////////
 //
-    int nsteps = 10000; int ntimes=3000;
+    int nsteps = 10000; int ntimes=500;
     cout << "nsteps " << nsteps << " ntimes= " << ntimes << endl;
     for (int i=0;i<n_steps;i++){
 
@@ -266,6 +266,7 @@ int main(int argc, char* argv[]) {
                 int stop_s=clock();
                 cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC) << " sec"<< endl;
                 cout<<"\t\t completion = " << j*100/ntimes << "% ; " << "; Rad = " << 0.5*r1/(j+1) << " ; " << 0.5*r2/(j+1)<< "; Etot = " << pols_energy/(j+1) <<  " ;z = "<<disntance_between_COM << " ;<z> = "<<-poly[0].zc<< " ; " << poly[1].zc-disntance_between_COM <<endl;
+                sys.gnuplot(j*(ntimes/100));
 
             }
 

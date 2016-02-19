@@ -27,13 +27,30 @@ class sim_system
         struct dom_decomposition
         {
             int ncells;
+            int n;
             int ** cell_neighbors;
-            int  hoc[600];
+            int  hoc[50000];
             int * linked_list;
+            vector < vector < int > > cell_list;
             double cell_size;
         } ;
         dom_decomposition dd;
         void create1D_linked_list();
+            const int neighbor_cell[39] = {
+    1, 0, 0,
+    0, 1, 0,
+    0, 0, 1,
+    -1, 0, 1,
+    0, -1, 1,
+    0, 1, 1,
+    1, 0, 1,
+    -1, 1, 0,
+    1, 1, 0,
+    -1, 1, 1,
+    1, -1, 1,
+    1, 1, 1,
+    -1, -1, 1,
+  };
 
 
         sim_system();
@@ -44,6 +61,7 @@ class sim_system
                                             //  within a polymer is specified
 
         double recalc_energy_pol_ll(int pol_i, int mol_i); //calculates energy of a molecule using linked lists
+        double recalc_energy_pol_ll_3D(int pol_i, int mol_i);
         int move_COM_pol( int pol_ind);                    // attempt of moving polymer as a whole
         double extra_energy_pol();                         // general extra energy terms that can be added
                                                             // to apply constraints to the system

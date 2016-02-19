@@ -19,21 +19,21 @@ using namespace std;
 
 inline double Distance(molecule m1, molecule m2){
 // minimum image convention implemented
-//	if (geometry==0){
+	if (geometry==0){
 
-//			double dx=(m1.x-m2.x);
-//			double dy=(m1.y-m2.y);
-//			double dz=(m1.z-m2.z);
-//			// periodic conditions
-//			if (dx>L/2.){  dx-=L;} else if (dx<-L/2.){  dx+=L;}
-//			if (dy>L/2.){  dy-=L;} else if (dy<-L/2.){  dy+=L;}
-//			if (dz>L/2.){  dz-=L;} else if (dz<-L/2.){  dz+=L;}
-//			return sqrt(dx*dx+dy*dy+dz*dz);
+			double dx=(m1.x-m2.x);
+			double dy=(m1.y-m2.y);
+			double dz=(m1.z-m2.z);
+			// periodic conditions
+			if (dx>L/2.){  dx-=L;} else if (dx<-L/2.){  dx+=L;}
+			if (dy>L/2.){  dy-=L;} else if (dy<-L/2.){  dy+=L;}
+			if (dz>L/2.){  dz-=L;} else if (dz<-L/2.){  dz+=L;}
+			return sqrt(dx*dx+dy*dy+dz*dz);
 
-//	}
-//	else if (geometry==1){
+	}
+	else if (geometry==1){
 			return sqrt((m1.x-m2.x)*(m1.x-m2.x)+(m1.y-m2.y)*(m1.y-m2.y)+(m1.z-m2.z)*(m1.z-m2.z));
-//	}
+	}
 
 }
 
