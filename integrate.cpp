@@ -65,7 +65,7 @@ double constraint_energy(molecule m1){
 	double r=L-m1.radius;
 	if( ( r > m1.lj_cut_constraint ) ){
 		return 0.0;}
-	else if( ( r < -time_step) ){
+	else if( ( r < -4*time_step) ){
 		cout << "\n\n!!! Warning: atom out of box! Check the constraint." << endl;
 		cout << "Atom # R = " << m1.radius <<"; xyz = " << m1.x <<" " << m1.y<<" " << m1.z << "; Type = " << m1.type << endl;
 //		m1.x=0.1; m1.y=0.1;m1.z=0.1;
@@ -84,7 +84,7 @@ double constraint_energy(molecule m1){
                 double e= pow(lj_sigma/r,12)-pow(lj_sigma/r,6) + lj_shift_cations ;
                 return 4.0*m1.lj_eps_constraint*e;}
             else if (m1.type==0){
-//                double e= pow(0.5*lj_sigma/r,12)-pow(0.5*lj_sigma/r,6) + lj_shift ;
+                double e= pow(0.5*lj_sigma/r,12)-pow(0.5*lj_sigma/r,6) + 0.25 ;
                 return 0.0;}
             else{
             	cout << "No such molecule type" << m1.type << endl;
@@ -327,6 +327,7 @@ void plot_radius(int  counts[], int j){
 		fprintf(gnuplotPipe, "set ticslevel 0 \n" );
 		fprintf(gnuplotPipe, "set title 'Radial Distribution'; set pointsize 0.70; \n");
 		fprintf(gnuplotPipe, "plot '%s' u 2:1 w l lt 1 lc -1,'%s' u 2:1 w p pt 7 lc 1  \n",(foldername+str).c_str(),(foldername+str).c_str() );
+		pclose(gnuplotPipe);
 
 }
 // make some return values for analysis functions using bulk concentration or charge?

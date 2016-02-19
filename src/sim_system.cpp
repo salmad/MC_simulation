@@ -64,7 +64,7 @@ void sim_system::create1D_linked_list()
 
     //set head of chains to zero
 
-    memset( dd.hoc, 0, 200*sizeof(int) );
+    memset( dd.hoc, -1, 200*sizeof(int) );
     for (int i=0; i<dd.ncells; i++)
     {
         dd.hoc[i]=-1;// -1 means nothing is there
@@ -74,12 +74,12 @@ void sim_system::create1D_linked_list()
     for (int i=0; i<max_part_id; i++)
     {
         molecule m1 = *mol_list[i];
-        int icell = ((m1.z+z_range/2.)/dd.cell_size);
+        int icell = ( ( (*mol_list[i]).z+z_range/2.)/dd.cell_size);
 
         if (icell > 0 && icell<dd.ncells )
         {
             dd.linked_list[i] = dd.hoc[icell];
-            dd.hoc[icell] = i;
+            dd.hoc[icell] = (*mol_list[i]).id; // id and i should coincide
 
         }
 
@@ -120,28 +120,23 @@ double sim_system::recalc_energy_pol_ll(int pol_i, int mol_i)
 
         while (id2 != -1)
         {
-            if(id1!=id2)
-            {
-                molecule m2 = *mol_list[id2];
-                 e += lj_energy(m1,m2);
-            }
+
+            molecule m2 = *mol_list[id2];
+            e += lj_energy(m1,m2);
             id2 = dd.linked_list[id2];
 
         }
 
     }
 
-    if (icell<dd.ncells && icell>0)
+    if (icell<dd.ncells && icell>-1)
     {
         int jcell = icell+1; //neighboring cell
         int id2 = dd.hoc[jcell]; //take the hoc of cell
         while (id2 != -1)
         {
-            if(id1!=id2)
-            {
-                molecule m2 = *mol_list[id2];
-                 e += lj_energy(m1,m2);
-            }
+            molecule m2 = *mol_list[id2];
+            e += lj_energy(m1,m2);
             id2 = dd.linked_list[id2];
         }
 
@@ -163,7 +158,6 @@ double sim_system::recalc_energy_pol_ll(int pol_i, int mol_i)
     // go through bonded ... to be done
 
     e += poly[pol_i].bond_energy(mol_i);
-
     // we can add some extra energies if necessary, e.g.
     e += sim_system::extra_energy_pol();
 
@@ -462,9 +456,7 @@ int sim_system::move_pivot_pol( int pol_ind){
 int sim_system::mc_step_pol( int pol_ind){
 //    double eold=calc_energy(M,size);
     int mol_ind = (int)(drand48()*(double)(poly[pol_ind].N));
-    double eold = recalc_energy_pol(pol_ind,mol_ind);
-
-    eold = recalc_energy_pol(pol_ind,mol_ind);
+    double eold = recalc_energy_pol_ll(pol_ind,mol_ind); //change into recalc_energy_pol() to use without linked lists
 
 
     double x1   = poly[pol_ind].M[mol_ind].x;

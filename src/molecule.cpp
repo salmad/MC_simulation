@@ -16,8 +16,9 @@ using namespace std;
 molecule::molecule(){
       q=0.0;lj_cut_constraint=lj_cut;lj_eps_constraint=lj_eps;type=0;
 
-      mol_id++;
+
       id = mol_id;
+      mol_id++;
       // type 0 switches off all interactions with the particle.
       // it is not propagated
 

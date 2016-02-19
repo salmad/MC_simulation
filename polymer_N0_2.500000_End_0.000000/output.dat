@@ -1,0 +1,149 @@
+########################################
+# Surface tension of a charged droplet #
+# Bulk properties #
+########################################
+
+Computer simulation
+	Simulation parameters: 
+		Bjerrum length = 0.7 nm
+		Box size = 20 nm; Droplet volume =  113.097 nm^3 ;
+		Number of particles = 0; Concentration = 0 nm^-3 ; 0M
+		Time step = 0.25 s
+		Screening length = inf nm
+		 kR = 0
+	 LJ Interaction parameters: 
+ 		 anion-surface eps = 4; sigma = 0.1; rcut = 0.2; roff = 0.05; shift = 0.00407922
+ 		 cation-surface eps = 0.05; sigma = 0.1; rcut = 0.3; roff = 0; shift = 0.25
+ 		 cation-anion eps = 0.05; sigma = 0.1; rcut = 0.3; roff = 0; shift = 0
+	Setting ionic properties...
+
+init polymer ...
+
+init polymer ...
+	Setting ionic properties...
+0
+from system print
+
+ Print polymer ID 1 ; COM : x = 0.1 y = 0.1 z = 0.1
+ N = 50 ;  
+ Polymer printed ...
+1
+from system print
+
+ Print polymer ID 2 ; COM : x = 0.1 y = 0.1 z = 0.1
+ N = 50 ;  
+ Polymer printed ...
+ ## Creating molecules list ... 
+Molecule list created. number of simple molecules = 0 ; Nmol = 0
+ ## Creating polymers list ... 
+ 	 polymer number  #0 with 50 molecules
+mol_list = 0
+mol_list = 1
+mol_list = 2
+mol_list = 3
+mol_list = 4
+mol_list = 5
+mol_list = 6
+mol_list = 7
+mol_list = 8
+mol_list = 9
+mol_list = 10
+mol_list = 11
+mol_list = 12
+mol_list = 13
+mol_list = 14
+mol_list = 15
+mol_list = 16
+mol_list = 17
+mol_list = 18
+mol_list = 19
+mol_list = 20
+mol_list = 21
+mol_list = 22
+mol_list = 23
+mol_list = 24
+mol_list = 25
+mol_list = 26
+mol_list = 27
+mol_list = 28
+mol_list = 29
+mol_list = 30
+mol_list = 31
+mol_list = 32
+mol_list = 33
+mol_list = 34
+mol_list = 35
+mol_list = 36
+mol_list = 37
+mol_list = 38
+mol_list = 39
+mol_list = 40
+mol_list = 41
+mol_list = 42
+mol_list = 43
+mol_list = 44
+mol_list = 45
+mol_list = 46
+mol_list = 47
+mol_list = 48
+mol_list = 49
+ 	 polymer number  #1 with 50 molecules
+mol_list = 50
+mol_list = 51
+mol_list = 52
+mol_list = 53
+mol_list = 54
+mol_list = 55
+mol_list = 56
+mol_list = 57
+mol_list = 58
+mol_list = 59
+mol_list = 60
+mol_list = 61
+mol_list = 62
+mol_list = 63
+mol_list = 64
+mol_list = 65
+mol_list = 66
+mol_list = 67
+mol_list = 68
+mol_list = 69
+mol_list = 70
+mol_list = 71
+mol_list = 72
+mol_list = 73
+mol_list = 74
+mol_list = 75
+mol_list = 76
+mol_list = 77
+mol_list = 78
+mol_list = 79
+mol_list = 80
+mol_list = 81
+mol_list = 82
+mol_list = 83
+mol_list = 84
+mol_list = 85
+mol_list = 86
+mol_list = 87
+mol_list = 88
+mol_list = 89
+mol_list = 90
+mol_list = 91
+mol_list = 92
+mol_list = 93
+mol_list = 94
+mol_list = 95
+mol_list = 96
+mol_list = 97
+mol_list = 98
+mol_list = 99
+ List created. max_part_id = 100
+		Returning molecule ... 
+		 number of returned molecules = 0
+	Warming steps:
+acceptances of moves: pivot = 0 ; local = 0.14908 ; COM = 0
+		Returning molecule ... 
+		 number of returned molecules = 0
+Main simulation steps:
+acceptances of moves: pivot = 0 ; local = 0.267161 ; COM = 0
