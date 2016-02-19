@@ -26,7 +26,7 @@ const int nbins=150;
 //Droplet size
 const int geometry=1;  // 0 if cubic , 1 if spherical
 const double L = 20.; // Nanometers
-const double R = 19.0;
+const double R = 3.0;
 const double V=4./3.*M_PI*pow(R,3); // for sphere 4./3.*M_PI*pow(L-2.0,3)
 //const double V=pow(L,3);
 //Electrostatic parameter
@@ -50,12 +50,12 @@ const double lj_shift_cations=0.25;
 const double kT=1.0;
 const double lambda=10.0;
 double k=2.0;
-double disntance_between_COM = 3.0;
+double disntance_between_COM = 0.0;
 double n0=2.5;
 double n_end=0.0;
 
 //# Number of polymers and simple (single) molecules
-int N_molecules = 2;
+int N_molecules = 0;
 int N_polymers  = 2;
 int mol_id      = 0;
 int pol_id      = 0;
@@ -151,7 +151,6 @@ int main(int argc, char* argv[]) {
 
     poly[0].update_COM();
     poly[1].update_COM();
-        cout << "\tHello" << endl;
     sys.create1D_linked_list();
 
 
@@ -163,15 +162,7 @@ int main(int argc, char* argv[]) {
     cout << "\Main simulation steps:" << endl;
 
     sys.create1D_linked_list();
-//    poly[0].polymer_RW_WI(0.,0.,0.);
-//    poly[1].polymer_RW_WI(0.,0.,0.+disntance_between_COM);
-//     acceptance = sys.mc_steps_pol(100000);
-//    for (int i =0 ; i<200 ; i++)
-//    {
-//        sys.move_pivot_pol(1);
-//        sys.gnuplot(i);
-//        cout<< "i = " << i << endl;
-//    }
+    sys.mc_steps_pol(100000);
 
 
 ////////////////////////////////////////////////////////////
@@ -224,63 +215,63 @@ int main(int argc, char* argv[]) {
 
 ///////////////////////////////////////////////////////////////////////////////////
 //
-    int nsteps = 10000; int ntimes=3000;
-    cout << "nsteps " << nsteps << " ntimes= " << ntimes << endl;
-    for (int i=0;i<n_steps;i++){
-
-        disntance_between_COM = n0-i*(n0-n_end)/(n_steps-1);
-        cout<<"i = " << i<<endl;
-
-        double pos1 = 0.,pos2 = 0., pos_av=0.0;double pols_energy=0.;
-        double r1 = 0.,r2 = 0.;
-
-        // Generate configurations :
-        poly[0].polymer_SAW(0.,0.,0.);
-        poly[1].polymer_SAW(0.,0.,0.+disntance_between_COM);
-        // Equilibrate configuration
-        acceptance = sys.mc_steps_pol(3000);
-        for (int j=0;j<ntimes;j++){
-
-//            // Generate configurations :
-//            poly[0].polymer_SAW(0.,0.,0.);
-//            poly[1].polymer_SAW(0.,0.,0.+disntance_between_COM);
-            // Initial radius
-            r1 += (pow(Distance(poly[0].M[0], poly[0].M[poly[0].N-1]),2)+pow(Distance(poly[1].M[0], poly[1].M[poly[1].N-1]),2));
-
-            cout << " ;energy = "<<sys.calc_total_energy()  << " ;acceptance= " << acceptance << endl;
-
-
-            // Equilibrate configuration
-            acceptance = sys.mc_steps_pol(nsteps);
-            poly[0].mindist();
-            poly[1].mindist();
-            // Data after equilibration
-            pos1    += poly[0].zc;
-            pos2    += poly[1].zc;
-            pos_av  += 0.5*(poly[1].zc-poly[0].zc-1.*disntance_between_COM);
-            pols_energy += sys.calc_total_energy();
-            r2 += (pow(Distance(poly[0].M[0], poly[0].M[poly[0].N-1]),2)+pow(Distance(poly[1].M[0], poly[1].M[poly[1].N-1]),2));
-
-            if (j%(ntimes/100)==0)
-            {
-                int stop_s=clock();
-                cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC) << " sec"<< endl;
-                cout<<"\t\t completion = " << j*100/ntimes << "% ; " << "; Rad = " << 0.5*r1/(j+1) << " ; " << 0.5*r2/(j+1)<< "; Etot = " << pols_energy/(j+1) <<  " ;z = "<<disntance_between_COM << " ;<z> = "<<-poly[0].zc<< " ; " << poly[1].zc-disntance_between_COM <<endl;
-
-            }
-
-        }
-
-    	cout << "\t\t Step #" << i << "; Etot = " << pols_energy/ntimes << "; Accept. = " << acceptance << "; <dx> = " << pos_av/ntimes << " ;z0 = " << disntance_between_COM << " ;<z1> = "<< pos1/ntimes << " ; <z2> = " << pos2/ntimes << endl;
-    	cout << " Radii= " << 0.5*r1/ntimes << " ; " << 0.5*r2/ntimes<< endl;
-
-        return_molecules(M);
-        sys.gnuplot(i);
-
-        int stop_s=clock();
-        cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC) << " sec"<< endl;
-
-    }
+//    int nsteps = 10000; int ntimes=3000;
+//    cout << "nsteps " << nsteps << " ntimes= " << ntimes << endl;
+//    for (int i=0;i<n_steps;i++){
+//
+//        disntance_between_COM = n0-i*(n0-n_end)/(n_steps-1);
+//        cout<<"i = " << i<<endl;
+//
+//        double pos1 = 0.,pos2 = 0., pos_av=0.0;double pols_energy=0.;
+//        double r1 = 0.,r2 = 0.;
+//
+//        // Generate configurations :
+//        poly[0].polymer_SAW(0.,0.,0.);
+//        poly[1].polymer_SAW(0.,0.,0.+disntance_between_COM);
+//        // Equilibrate configuration
+//        acceptance = sys.mc_steps_pol(3000);
+//        for (int j=0;j<ntimes;j++){
+//
+////            // Generate configurations :
+////            poly[0].polymer_SAW(0.,0.,0.);
+////            poly[1].polymer_SAW(0.,0.,0.+disntance_between_COM);
+//            // Initial radius
+//            r1 += (pow(Distance(poly[0].M[0], poly[0].M[poly[0].N-1]),2)+pow(Distance(poly[1].M[0], poly[1].M[poly[1].N-1]),2));
+//
+//            cout << " ;energy = "<<sys.calc_total_energy()  << " ;acceptance= " << acceptance << endl;
+//
+//
+//            // Equilibrate configuration
+//            acceptance = sys.mc_steps_pol(nsteps);
+//            poly[0].mindist();
+//            poly[1].mindist();
+//            // Data after equilibration
+//            pos1    += poly[0].zc;
+//            pos2    += poly[1].zc;
+//            pos_av  += 0.5*(poly[1].zc-poly[0].zc-1.*disntance_between_COM);
+//            pols_energy += sys.calc_total_energy();
+//            r2 += (pow(Distance(poly[0].M[0], poly[0].M[poly[0].N-1]),2)+pow(Distance(poly[1].M[0], poly[1].M[poly[1].N-1]),2));
+//
+//            if (j%(ntimes/100)==0)
+//            {
+//                int stop_s=clock();
+//                cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC) << " sec"<< endl;
+//                cout<<"\t\t completion = " << j*100/ntimes << "% ; " << "; Rad = " << 0.5*r1/(j+1) << " ; " << 0.5*r2/(j+1)<< "; Etot = " << pols_energy/(j+1) <<  " ;z = "<<disntance_between_COM << " ;<z> = "<<-poly[0].zc<< " ; " << poly[1].zc-disntance_between_COM <<endl;
+//
+//            }
+//
+//        }
+//
+//    	cout << "\t\t Step #" << i << "; Etot = " << pols_energy/ntimes << "; Accept. = " << acceptance << "; <dx> = " << pos_av/ntimes << " ;z0 = " << disntance_between_COM << " ;<z1> = "<< pos1/ntimes << " ; <z2> = " << pos2/ntimes << endl;
+//    	cout << " Radii= " << 0.5*r1/ntimes << " ; " << 0.5*r2/ntimes<< endl;
+//
+//        return_molecules(M);
+//        sys.gnuplot(i);
+//
+//        int stop_s=clock();
+//        cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC) << " sec"<< endl;
+//
+//    }
 
 //
 //
