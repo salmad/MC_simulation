@@ -6,16 +6,25 @@
 Computer simulation
 	Simulation parameters: 
 		Bjerrum length = 0.7 nm
+<<<<<<< HEAD
 		Box size = 20 nm; Droplet volume =  28730.9 nm^3 ;
 		Number of particles = 2; Concentration = 6.96114e-05 nm^-3 ; 0.000116019M
 		Time step = 0.25 s
 		Screening length = 1633.1 nm
 		 kR = 0.0116343
+=======
+		Box size = 20 nm; Droplet volume =  113.097 nm^3 ;
+		Number of particles = 0; Concentration = 0 nm^-3 ; 0M
+		Time step = 0.25 s
+		Screening length = inf nm
+		 kR = 0
+>>>>>>> bb653749848eb675df987098fe44936bbb6aef03
 	 LJ Interaction parameters: 
  		 anion-surface eps = 4; sigma = 0.1; rcut = 0.2; roff = 0.05; shift = 0.00407922
  		 cation-surface eps = 0.05; sigma = 0.1; rcut = 0.3; roff = 0; shift = 0.25
  		 cation-anion eps = 0.05; sigma = 0.1; rcut = 0.3; roff = 0; shift = 0
 	Setting ionic properties...
+<<<<<<< HEAD
 0
 
  ID = 0;  Molecule type = 0 ; q = 0; Radius = 12.9177
@@ -26,6 +35,8 @@ Computer simulation
  ID = 1;  Molecule type = 0 ; q = 0; Radius = 16.1462
  x = 9.20727; y = -5.73732; z =  11.9587
  LJ parameters: sigma = 0.3; eps = 0.05
+=======
+>>>>>>> bb653749848eb675df987098fe44936bbb6aef03
 
 init polymer ...
 
@@ -35,18 +46,33 @@ init polymer ...
 from system print
 
  Print polymer ID 1 ; COM : x = 0.1 y = 0.1 z = 0.1
+<<<<<<< HEAD
  N = 100 ;  
+=======
+ N = 50 ;  
+>>>>>>> bb653749848eb675df987098fe44936bbb6aef03
  Polymer printed ...
 1
 from system print
 
  Print polymer ID 2 ; COM : x = 0.1 y = 0.1 z = 0.1
+<<<<<<< HEAD
  N = 100 ;  
  Polymer printed ...
  ## Creating molecules list ... 
 Molecule list created. max molecule id= 1 ; Nmol = 2
  ## Creating polymers list ... 
  	 polymer number  #0 with 100 molecules
+=======
+ N = 50 ;  
+ Polymer printed ...
+ ## Creating molecules list ... 
+Molecule list created. number of simple molecules = 0 ; Nmol = 0
+ ## Creating polymers list ... 
+ 	 polymer number  #0 with 50 molecules
+mol_list = 0
+mol_list = 1
+>>>>>>> bb653749848eb675df987098fe44936bbb6aef03
 mol_list = 2
 mol_list = 3
 mol_list = 4
@@ -95,6 +121,10 @@ mol_list = 46
 mol_list = 47
 mol_list = 48
 mol_list = 49
+<<<<<<< HEAD
+=======
+ 	 polymer number  #1 with 50 molecules
+>>>>>>> bb653749848eb675df987098fe44936bbb6aef03
 mol_list = 50
 mol_list = 51
 mol_list = 52
@@ -145,6 +175,7 @@ mol_list = 96
 mol_list = 97
 mol_list = 98
 mol_list = 99
+<<<<<<< HEAD
 mol_list = 100
 mol_list = 101
  	 polymer number  #1 with 100 molecules
@@ -331,3 +362,14 @@ time: 103.916 sec
  ;energy = 191.36 ;acceptance= 0.3225
 acceptances of moves: pivot = 0.0914286 ; local = 0.324828 ; COM = 0.74
  ;energy = 181.934 ;acceptance= 0.326
+=======
+ List created. max_part_id = 100
+		Returning molecule ... 
+		 number of returned molecules = 0
+	Warming steps:
+acceptances of moves: pivot = 0 ; local = 0.14908 ; COM = 0
+		Returning molecule ... 
+		 number of returned molecules = 0
+Main simulation steps:
+acceptances of moves: pivot = 0 ; local = 0.267161 ; COM = 0
+>>>>>>> bb653749848eb675df987098fe44936bbb6aef03

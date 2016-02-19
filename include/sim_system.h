@@ -28,7 +28,11 @@ class sim_system
         {
             int ncells;
             int ** cell_neighbors;
+<<<<<<< HEAD
             int  hoc[600];
+=======
+            int  hoc[200];
+>>>>>>> bb653749848eb675df987098fe44936bbb6aef03
             int * linked_list;
             double cell_size;
         } ;

@@ -16,7 +16,11 @@ using namespace std;
 
 polymer::polymer()
 {
+<<<<<<< HEAD
     N = 100;
+=======
+    N = 50;
+>>>>>>> bb653749848eb675df987098fe44936bbb6aef03
     M = new molecule [N];
 //    molecule m2[N];
 //    M = m1 ;//ctor

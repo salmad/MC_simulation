@@ -169,7 +169,11 @@
 	"../global.h"
 	"polymer.h"
 
+<<<<<<< HEAD
 1455891900 source:/home/salim/Documents/MC_simulation/main.cpp
+=======
+1455878865 source:/home/salim/Documents/MC_simulation/main.cpp
+>>>>>>> bb653749848eb675df987098fe44936bbb6aef03
 	<vector>
 	<cstdlib>
 	<iomanip>
@@ -216,6 +220,7 @@
 	<cmath>
 	<fstream>
 
+<<<<<<< HEAD
 1455891780 source:/home/salim/Documents/MC_simulation/src/sim_system.cpp
 	"../include/sim_system.h"
 	"../global.h"
@@ -318,6 +323,9 @@
 	<fstream>
 
 1455914027 source:/home/salim/MEGA/MC_simulation/src/sim_system.cpp
+=======
+1455878865 source:/home/salim/Documents/MC_simulation/src/sim_system.cpp
+>>>>>>> bb653749848eb675df987098fe44936bbb6aef03
 	"../include/sim_system.h"
 	"../global.h"
 	"../molecule.h"
