@@ -29,13 +29,14 @@ class sim_system
             int ncells;
             int n;
             int ** cell_neighbors;
-            int  hoc[50000];
+            int  hoc[40000];
             int * linked_list;
             vector < vector < int > > cell_list;
             double cell_size;
         } ;
         dom_decomposition dd;
         void create1D_linked_list();
+        void create3D_linked_list();
             const int neighbor_cell[39] = {
     1, 0, 0,
     0, 1, 0,

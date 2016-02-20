@@ -94,19 +94,19 @@ double constraint_energy(molecule m1){
 		 }
 	}
 	else if (geometry==0){
-		return 0.0;
-//	if( ( m1.x > m1.lj_cut_constraint )&&( m1.y > m1.lj_cut_constraint )&&( m1.z > m1.lj_cut_constraint ) && ( L-m1.x > m1.lj_cut_constraint )&&(L- m1.y > m1.lj_cut_constraint )&&( L-m1.z > m1.lj_cut_constraint ) ) {
-//		return 0.0;}
-//	else {
-//		double e=0.0;double r = L/2.;
-////		r=m1.x ; e+= pow(lj_sigma/r,12)-pow(lj_sigma/r,6) + lj_shift_anions ;
-////		r=m1.y ; e+= pow(lj_sigma/r,12)-pow(lj_sigma/r,6) + lj_shift_anions ;
-////		r=m1.z ; e+= pow(lj_sigma/r,12)-pow(lj_sigma/r,6) + lj_shift_anions ;
-////		r=L-m1.x ; e+= pow(lj_sigma/r,12)-pow(lj_sigma/r,6) + lj_shift_anions ;
-////		r=L-m1.y ; e+= pow(lj_sigma/r,12)-pow(lj_sigma/r,6) + lj_shift_anions ;
-////		r=L-m1.z ; e+= pow(lj_sigma/r,12)-pow(lj_sigma/r,6) + lj_shift_anions ;
-//        return 4.0*m1.lj_eps_constraint*e;
-//	}
+//		return 0.0;
+	if( ( m1.x > m1.lj_cut_constraint )&&( m1.y > m1.lj_cut_constraint )&&( m1.z > m1.lj_cut_constraint ) && ( L-m1.x > m1.lj_cut_constraint )&&(L- m1.y > m1.lj_cut_constraint )&&( L-m1.z > m1.lj_cut_constraint ) ) {
+		return 0.0;}
+	else {
+		double e=0.0;double r = L/2.;
+		r=m1.x ; e+= pow(lj_sigma/r,12)-pow(lj_sigma/r,6) + 0.25 ;
+		r=m1.y ; e+= pow(lj_sigma/r,12)-pow(lj_sigma/r,6) + 0.25 ;
+		r=m1.z ; e+= pow(lj_sigma/r,12)-pow(lj_sigma/r,6) + 0.25;
+		r=L-m1.x ; e+= pow(lj_sigma/r,12)-pow(lj_sigma/r,6) + 0.25 ;
+		r=L-m1.y ; e+= pow(lj_sigma/r,12)-pow(lj_sigma/r,6) + 0.25 ;
+		r=L-m1.z ; e+= pow(lj_sigma/r,12)-pow(lj_sigma/r,6) + 0.25 ;
+        return 4.0*m1.lj_eps_constraint*e;
+	}
 	}
 	else{
 		cout << "unknown geometry! check the constraint"<< endl;

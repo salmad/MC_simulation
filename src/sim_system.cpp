@@ -49,6 +49,7 @@ sim_system::sim_system()
     dd.linked_list = new int  [MAX_PART];
     dd.cell_size = 1.0;
     memset(dd.linked_list, -1, sizeof(dd.linked_list));
+    memset( dd.hoc, -1, 40000*sizeof(int) );
 
 
     //bond_list;
@@ -56,8 +57,44 @@ sim_system::sim_system()
 
 }
 
+
 // linked list should be created after particle lists (which refer to pointers)
 void sim_system::create1D_linked_list()
+{
+    double z_range = 2*(R+2);
+//    dd.ncells = int(z_range/lj_cut);
+    dd.n = (int)floor(L/lj_cut);
+    dd.ncells  = dd.n;
+ // dd.cell_size = z_range/int(z_range/lj_cut);
+    dd.cell_size = L/dd.n;
+
+    //set head of chains to zero
+
+    for (int i=0; i<dd.ncells; i++)
+    {
+        dd.hoc[i]=-1;// -1 means nothing is there
+    }
+
+    // fill arrays with particles, OLD 1D implementation
+    for (int i=0; i<max_part_id+1; i++)
+    {
+        int icell = int(floor((*mol_list[i]).z /dd.cell_size)) % dd.n;
+        if (icell < 0) icell += dd.n;
+
+//    cout << "icell "<<icell << " i "<< i << " z = "<< (*mol_list[i]).z << " id" <<(*mol_list[i]).id  << endl;
+        if (icell<dd.ncells )
+        {
+            dd.linked_list[i] = dd.hoc[icell];
+            dd.hoc[icell] = i; // id and i should coincide
+        }
+
+    }
+
+}
+
+
+// linked list should be created after particle lists (which refer to pointers)
+void sim_system::create3D_linked_list()
 {
     double z_range = 2*(R+2);
 //    dd.ncells = int(z_range/lj_cut);
@@ -68,25 +105,11 @@ void sim_system::create1D_linked_list()
 
     //set head of chains to zero
 
-    memset( dd.hoc, -1, 50000*sizeof(int) );
-//    for (int i=0; i<dd.ncells; i++)
-//    {
-//        dd.hoc[i]=-1;// -1 means nothing is there
-//    }
+    for (int i=0; i<dd.ncells; i++)
+    {
+        dd.hoc[i]=-1;// -1 means nothing is there
+    }
 
-    // fill arrays with particles, OLD 1D implementation
-//    for (int i=0; i<max_part_id+1; i++)
-//    {
-//        int icell = int( ( (*mol_list[i]).z+0*z_range/2.)/dd.cell_size);
-//
-////    cout << "icell "<<icell << " i "<< i << " z = "<< (*mol_list[i]).z << " id" <<(*mol_list[i]).id  << endl;
-//        if (icell<dd.ncells )
-//        {
-//            dd.linked_list[i] = dd.hoc[icell];
-//            dd.hoc[icell] = (*mol_list[i]).id; // id and i should coincide
-//        }
-//
-//    }
 
         for (int i = 0; i < max_part_id+1; i++) {
         // x,y,z index of the cell
@@ -105,20 +128,6 @@ void sim_system::create1D_linked_list()
 
       }
 
-
-    //create neighbor list : to be done
-//    dd.cell_neighbors = new int * ;
-//    int neighbors[dd.ncells][3];
-//    memset( neighbors, -1, dd.ncells*3*sizeof(int) );
-//    cout << "neighbor of cell " << 0 << " is cell <<" << neighbors <<endl;
-//    for (int i = 0; i<dd.ncells ; i++)
-//    {
-//        if (i==0) {neighbors[i][0] = i;neighbors[i][1] = i+1; }
-//        else if (i==dd.ncells-1) {neighbors[i][0] = i-1;neighbors[i][1] = i;}
-//        else {neighbors[i][0] = i-1;neighbors[i][1] = i;neighbors[i][2] = i+1;}
-//        cout << "neighbor of cell " << i << " is cell " << neighbors[i][0] <<endl;
-//    }
-//    dd.cell_neighbors = neighbors;
 }
 
 //energy using cell list
@@ -208,7 +217,7 @@ double sim_system::recalc_energy_pol_ll_3D(int pol_i, int mol_i)
 
 
     // calculate non-bonded part
-    create1D_linked_list();
+    create3D_linked_list();
 
 //look at the same cell first
     int jcell = icell; //neighboring cell
@@ -278,6 +287,7 @@ double sim_system::recalc_energy_pol_ll_3D(int pol_i, int mol_i)
     // go through bonded ... to be done
 
     e += poly[pol_i].bond_energy(mol_i);
+
     // we can add some extra energies if necessary, e.g.
     e += sim_system::extra_energy_pol();
 
@@ -596,7 +606,7 @@ int sim_system::move_pivot_pol( int pol_ind){
 int sim_system::mc_step_pol( int pol_ind){
 //    double eold=calc_energy(M,size);
     int mol_ind = (int)(drand48()*(double)(poly[pol_ind].N));
-    double eold = recalc_energy_pol_ll_3D(pol_ind,mol_ind); //change into recalc_energy_pol() to use without linked lists
+    double eold = recalc_energy_pol(pol_ind,mol_ind); //change into recalc_energy_pol() to use without linked lists
 //    cout << " ll E = "<<eold <<endl;
 //    eold = recalc_energy_pol(pol_ind,mol_ind); //change into recalc_energy_pol() to use without linked lists
 //    cout << " " << eold <<endl;
@@ -616,7 +626,7 @@ int sim_system::mc_step_pol( int pol_ind){
     poly[pol_ind].yc += Dyc;
     poly[pol_ind].zc += Dzc;
 
-    double enew = recalc_energy_pol_ll(pol_ind, mol_ind);
+    double enew = recalc_energy_pol(pol_ind, mol_ind);
    // enew       +=  sim_system::extra_energy_pol();
 
 
@@ -711,22 +721,22 @@ int sim_system::gnuplot(int j /*, char * file_format*/){
 	    int cnt = 1;
 	    fprintf(positions_file2,"REMARK polymer configuration in MC code\n");
 
-//	    for(int i=0; i < 20;i++)
-//	    {
-//            for(int kk=0; kk < 30;kk++)
-//                {
-//            //double theta=acos(2*(drand48()-0.5));
-//            double theta=acos(-1.0+i*2.0/20.);
-//            //double phi=M_PI*drand48();
-//            double phi=2.0*M_PI*kk*1.0/20.;
-//            double x = R*sin(theta)*cos(phi);
-//            double y = R*sin(theta)*sin(phi);
-//            double z = R*cos(theta);
-//                //positions_file2 << poly[i].M[j].x << "  " << poly[i].M[j].y << "  " << poly[i].M[j].z << "  " << poly[i].id  << endl;
-//            fprintf(positions_file2,"ATOM %6d%4s  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d \n",cnt, "FE",cnt-1,x,y,z , 10 );
-//            cnt++;
-//
-//	    }}
+	    for(int i=0; i < 20;i++)
+	    {
+            for(int kk=0; kk < 30;kk++)
+                {
+            //double theta=acos(2*(drand48()-0.5));
+            double theta=acos(-1.0+i*2.0/20.);
+            //double phi=M_PI*drand48();
+            double phi=2.0*M_PI*kk*1.0/20.;
+            double x =L/2.+ 0.5*R*sin(theta)*cos(phi);
+            double y =L/2.+ 0.5*R*sin(theta)*sin(phi);
+            double z =L/2.+ 0.5*R*cos(theta);
+                //positions_file2 << poly[i].M[j].x << "  " << poly[i].M[j].y << "  " << poly[i].M[j].z << "  " << poly[i].id  << endl;
+            fprintf(positions_file2,"ATOM %6d%4s  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d \n",cnt, "FE",cnt-1,x,y,z , 10 );
+            cnt++;
+
+	    }}
 
 //	    	    for(int i=0; i < N_molecules;i++)
 //	    {

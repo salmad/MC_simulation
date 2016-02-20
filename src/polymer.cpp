@@ -16,7 +16,7 @@ using namespace std;
 
 polymer::polymer()
 {
-    N = 20;
+    N = 50;
     M = new molecule [N];
 //    molecule m2[N];
 //    M = m1 ;//ctor
@@ -97,10 +97,10 @@ void polymer::polymer_RW( /* int Nset  = 10 , */ double r /* = 0.0 */)
     double x = r*sin(theta)*cos(phi);
     double y = r*sin(theta)*sin(phi);
     double z = r*cos(theta);
-    if (geometry == 0){
-    if (x>L){x-=L;} else if (x<0.0){x+=L;}
-    if (y>L){y-=L;} else if (y<0.0){y+=L;}
-    if (z>L){z-=L;} else if (z<0.0){z+=L;}}
+//    if (geometry == 0){
+//    if (x>L){x-=L;} else if (x<0.0){x+=L;}
+//    if (y>L){y-=L;} else if (y<0.0){y+=L;}
+//    if (z>L){z-=L;} else if (z<0.0){z+=L;}}
     M[0].move_to_position(x,y,z);
 
 
@@ -187,10 +187,10 @@ void polymer::displace_polymer( double x, double y, double z)
         M[i].x+=x;
         M[i].y+=y;
         M[i].z+=z;
-            if (geometry == 0){
-    if (x>L){x-=L;} else if (x<0.0){x+=L;}
-    if (y>L){y-=L;} else if (y<0.0){y+=L;}
-    if (z>L){z-=L;} else if (z<0.0){z+=L;}}
+//            if (geometry == 0){
+//    if (x>L){x-=L;} else if (x<0.0){x+=L;}
+//    if (y>L){y-=L;} else if (y<0.0){y+=L;}
+//    if (z>L){z-=L;} else if (z<0.0){z+=L;}}
     }
     xc+=x; yc+=y ; zc+=z;
 }
@@ -307,7 +307,7 @@ void polymer::print(){
     for (int i = 0; i < N; ++i)
     {
         /* print all molecules */
-        //M[i].print();
+        M[i].print();
     }
     cout << " Polymer printed ..." << endl;
 }

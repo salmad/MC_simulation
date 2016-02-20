@@ -235,8 +235,8 @@ int main(int argc, char* argv[]) {
         double r1 = 0.,r2 = 0.;
 
         // Generate configurations :
-        poly[0].polymer_SAW(0.,0.,0.);
-        poly[1].polymer_SAW(0.,0.,0.+disntance_between_COM);
+        poly[0].polymer_SAW(L/2.,L/2.,L/2.);
+        poly[1].polymer_SAW(L/2.,L/2.,L/2.+disntance_between_COM);
         // Equilibrate configuration
         acceptance = sys.mc_steps_pol(3000);
         for (int j=0;j<ntimes;j++){
@@ -265,7 +265,7 @@ int main(int argc, char* argv[]) {
             {
                 int stop_s=clock();
                 cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC) << " sec"<< endl;
-                cout<<"\t\t completion = " << j*100/ntimes << "% ; " << "; Rad = " << 0.5*r1/(j+1) << " ; " << 0.5*r2/(j+1)<< "; Etot = " << pols_energy/(j+1) <<  " ;z = "<<disntance_between_COM << " ;<z> = "<<-poly[0].zc<< " ; " << poly[1].zc-disntance_between_COM <<endl;
+                cout<<"\t\t completion = " << j*100/ntimes << "% ; " << "; Rad = " << 0.5*r1/(j+1) << " ; " << 0.5*r2/(j+1)<< "; Etot = " << pols_energy/(j+1) <<  " ;z = "<<disntance_between_COM << " ;<z> = "<< poly[0].zc<< " ; " << poly[1].zc<<endl;
                 sys.gnuplot(j*(ntimes/100));
 
             }
