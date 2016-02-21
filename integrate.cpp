@@ -469,9 +469,9 @@ void return_molecules(molecule M[]){
     		if((M[i].x >L)||(M[i].y >L)||(M[i].z >L)||(M[i].x <-0.01)||(M[i].y <-0.01)||(M[i].z <-0.01)){
     			cout << "\t\t Cubic geometry! Particle fixed! xyz old = " <<  M[i].x<< " ;"<< M[i].y << " ;" << M[i].z   << endl;
     			j++;
-    	    	double x1=drand48()*(L);
-    	    	double y1=drand48()*(L);
-    	    	double z1=drand48()*(L);
+    	    	double x1 = fmod(M[i].x+10*L,L);
+    	    	double y1 = fmod(M[i].y+10*L,L);
+    	    	double z1 = fmod(M[i].z+10*L,L);
     			M[i].move_to_position(x1,y1,z1);
     			cout << "\t\t Cubic geometry! Particle fixed! xyz new = " <<  M[i].x<< " ;"<< M[i].y << " ;" << M[i].z   << endl;
     		}

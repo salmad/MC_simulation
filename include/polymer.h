@@ -28,7 +28,12 @@ class polymer
         double mindist( );
         void polymer_RW_WI( double x ,double y ,double z );
         void polymer_SAW( double x, double y, double z);
-        void displace_polymer( double x ,double y ,double z );
+        void displace( double dx ,double dy ,double dz );
+        void set_COM( double x ,double y ,double z );
+
+        // turns a polymer chain using ith atom as pivot by angle=angle;
+        // the axes of rotation is set by phi and theta
+        void pivot_turn(int i, double phi, double theta, double angle);
         virtual ~polymer();
         void update_COM();
 

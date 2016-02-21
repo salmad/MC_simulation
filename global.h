@@ -39,8 +39,10 @@ extern const double lj_shift_cations;
 
 extern int N_molecules;
 extern int N_polymers;
+extern int N_stars;
 extern int mol_id;
 extern int pol_id;
+extern int star_id;
 extern const double kT;
 extern const double lambda;
 extern double k;

@@ -25,7 +25,7 @@ const double time_step = 0.25;
 const int nbins=150;
 //Droplet size
 const int geometry=0;  // 0 if cubic , 1 if spherical
-const double L = 10.; // Nanometers
+const double L = 20.; // Nanometers
 const double R = 10.0;
 const double V=4./3.*M_PI*pow(R,3); // for sphere 4./3.*M_PI*pow(L-2.0,3)
 //const double V=pow(L,3);
@@ -57,8 +57,10 @@ double n_end=0.0;
 //# Number of polymers and simple (single) molecules
 int N_molecules = 2;
 int N_polymers  = 2;
+int N_stars     = 1;
 int mol_id      = 0;
 int pol_id      = 0;
+int star_id      = 0;
 int main(int argc, char* argv[]) {
 
 // initial and final number of molecues, number of steps
@@ -121,11 +123,13 @@ int main(int argc, char* argv[]) {
      }
 
      polymer poly[N_polymers];
+     star    stars[N_stars];
 
 //     system initialization;
      sim_system sys;
      sys.M = M;
      sys.poly = poly;
+     sys.stars = stars;
 
     cout << "\tSetting ionic properties..." << endl;
     for (int i=0;i<N_polymers;i++){
@@ -134,6 +138,15 @@ int main(int argc, char* argv[]) {
         cout << "from system print" << endl;
         sys.poly[i].print();
      }
+
+     for (int i=0;i<N_stars;i++){
+        cout << i << endl;
+        cout << "from system print" << endl;
+        sys.stars[i].print();
+     }
+
+     sys.stars[0].poly[0].polymer_SAW(L/2.,L/2.,L/2.);
+     sys.stars[0].poly[1].polymer_SAW(L/2.,L/2.,L/2.);
 
      sys.create_particle_list();
      molecule ** part_list = sys.mol_list;
@@ -151,27 +164,35 @@ int main(int argc, char* argv[]) {
 
     poly[0].update_COM();
     poly[1].update_COM();
-        cout << "\tHello" << endl;
+
     sys.create1D_linked_list();
 
 
     //double acceptance = sys.mc_steps_mol(1000);
 
-    double acceptance = sys.mc_steps_pol(10000);
+    //double acceptance = sys.mc_steps_pol(10000);
 
-    return_molecules(M);
+    //return_molecules(M);
     cout << "\Main simulation steps:" << endl;
 
     sys.create1D_linked_list();
-//    poly[0].polymer_RW_WI(0.,0.,0.);
-//    poly[1].polymer_RW_WI(0.,0.,0.+disntance_between_COM);
-//     acceptance = sys.mc_steps_pol(100000);
-//    for (int i =0 ; i<200 ; i++)
-//    {
-//        sys.move_pivot_pol(1);
-//        sys.gnuplot(i);
-//        cout<< "i = " << i << endl;
-//    }
+
+    double acceptance = sys.mc_steps_star(1000);
+        cout << "\tHello" << endl;
+    sys.gnuplot(55);
+
+    acceptance = sys.mc_steps_star(1000);
+    sys.gnuplot(56);
+
+   stars[0].poly[0].polymer_RW_WI(L/2.,L/2.,L/2.);
+   stars[0].poly[1].polymer_RW_WI(L/2.,L/2.,L/2.);
+
+   for (int i =0 ; i<200 ; i++)
+   {
+       sys.mc_steps_star(10000);
+       sys.gnuplot(i);
+       cout<< "i = " << i << endl;
+   }
 
 
 ////////////////////////////////////////////////////////////

@@ -2,6 +2,7 @@
 #define SIM_SYSTEM_H
 #include "../molecule.h"
 #include "polymer.h"
+#include "star.h"
 #include <vector>
 
 using namespace std;
@@ -12,6 +13,7 @@ class sim_system
     public:
         molecule * M;
         polymer  * poly;
+        star    * stars;
         molecule *other;
         // how to change mol_list into list of references , e.g. (molecule *) mol_list[]
         molecule ** mol_list;
@@ -61,6 +63,9 @@ class sim_system
         double recalc_energy_pol(int , int); // calculatels energy when a molecule
                                             //  within a polymer is specified
 
+        double recalc_energy_star_ll(int star_i, int pol_i, int mol_i); // calculatels energy when a molecule
+                                                        //  within a polymer is specified
+
         double recalc_energy_pol_ll(int pol_i, int mol_i); //calculates energy of a molecule using linked lists
         double recalc_energy_pol_ll_3D(int pol_i, int mol_i);
         int move_COM_pol( int pol_ind);                    // attempt of moving polymer as a whole
@@ -75,6 +80,9 @@ class sim_system
         int mc_step_pol( int );
         double mc_steps_pol( int );
         double mc_steps_pol_ll( int );
+
+        int mc_step_star( int );
+        double mc_steps_star( int );
 
         int gnuplot(int j);
 
