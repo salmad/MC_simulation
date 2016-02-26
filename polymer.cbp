@@ -13,6 +13,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-g" />
+					<Add directory="include" />
 				</Compiler>
 			</Target>
 			<Target title="Release">
@@ -22,6 +23,7 @@
 				<Option compiler="gcc" />
 				<Compiler>
 					<Add option="-O2" />
+					<Add directory="include" />
 				</Compiler>
 				<Linker>
 					<Add option="-s" />
@@ -36,12 +38,14 @@
 		<Unit filename="include/integrate.h" />
 		<Unit filename="include/polymer.h" />
 		<Unit filename="include/sim_system.h" />
+		<Unit filename="include/star.h" />
 		<Unit filename="integrate.cpp" />
 		<Unit filename="main.cpp" />
 		<Unit filename="molecule.h" />
 		<Unit filename="src/molecule.cpp" />
 		<Unit filename="src/polymer.cpp" />
 		<Unit filename="src/sim_system.cpp" />
+		<Unit filename="src/star.cpp" />
 		<Extensions>
 			<code_completion />
 			<debugger />

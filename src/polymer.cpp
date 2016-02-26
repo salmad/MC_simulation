@@ -16,7 +16,7 @@ using namespace std;
 
 polymer::polymer()
 {
-    N = 100;
+    N = 50;
     M = new molecule [N];
 //    molecule m2[N];
 //    M = m1 ;//ctor
@@ -323,17 +323,34 @@ void polymer::pivot_turn(int i, double phi, double theta, double angle){
     double Rzy = uy*uz*(1-cosine) + ux*sine;
     double Rzz = cosine + uz*uz*(1-cosine);
 
-
-    for (int j = i+1; j < N; j++)
+    if (i<N/2)
     {
+        for (int j = 0; j < i; j++)
+        {
 //        eold_s          += recalc_energy_pol(pol_ind,i);
-        molecule  * turned;
-        turned = &(M[j]);
-        double x         = pivot->x + (turned->x-pivot->x)*Rxx+(turned->y-pivot->y)*Rxy+(turned->z-pivot->z)*Rxz;
-        double y         = pivot->y + (turned->x-pivot->x)*Ryx+(turned->y-pivot->y)*Ryy+(turned->z-pivot->z)*Ryz;
-        double z         = pivot->z + (turned->x-pivot->x)*Rzx+(turned->y-pivot->y)*Rzy+(turned->z-pivot->z)*Rzz;;
-        M[j].move_to_position(x,y,z);
+            molecule  * turned;
+            turned = &(M[j]);
+            double x         = pivot->x + (turned->x-pivot->x)*Rxx+(turned->y-pivot->y)*Rxy+(turned->z-pivot->z)*Rxz;
+            double y         = pivot->y + (turned->x-pivot->x)*Ryx+(turned->y-pivot->y)*Ryy+(turned->z-pivot->z)*Ryz;
+            double z         = pivot->z + (turned->x-pivot->x)*Rzx+(turned->y-pivot->y)*Rzy+(turned->z-pivot->z)*Rzz;;
+            M[j].move_to_position(x,y,z);
+        }
     }
+
+    if (i>N/2)
+    {
+        for (int j = i+1; j < N; j++)
+        {
+//        eold_s          += recalc_energy_pol(pol_ind,i);
+            molecule  * turned;
+            turned = &(M[j]);
+            double x         = pivot->x + (turned->x-pivot->x)*Rxx+(turned->y-pivot->y)*Rxy+(turned->z-pivot->z)*Rxz;
+            double y         = pivot->y + (turned->x-pivot->x)*Ryx+(turned->y-pivot->y)*Ryy+(turned->z-pivot->z)*Ryz;
+            double z         = pivot->z + (turned->x-pivot->x)*Rzx+(turned->y-pivot->y)*Rzy+(turned->z-pivot->z)*Rzz;;
+            M[j].move_to_position(x,y,z);
+        }
+    }
+
 
 }
 

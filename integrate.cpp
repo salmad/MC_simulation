@@ -309,7 +309,7 @@ void plot_radius(int  counts[], int j){
     sprintf(str,"/radius_prob%d.dat",j);
 //    printf(str);
 	radius_file.open( (foldername+str).c_str() , ofstream::out | ofstream::trunc);
-	double dr = R/nbins;
+	double dr = abs(n_end-n0)/nbins;
 	for(int i=0;i<nbins;i++){
 	   	radius_file << (double)counts[i]/4.0/M_PI/((1.0+i)*dr)/((1.0+i)*dr)/(dr)/(j+1) << "  " << (double)(1.0+i)*dr  << endl;
 	    }
@@ -321,12 +321,12 @@ void plot_radius(int  counts[], int j){
 		    FILE * gnuplotPipe = popen ("gnuplot -persistent", "w");
 
 		fprintf(gnuplotPipe, "set terminal postscript eps enhanced color font 'Helvetica,20'\n");
-		fprintf(gnuplotPipe, "set output 'radial%d.eps'\n",j );
+		fprintf(gnuplotPipe, "set output './%s/radial%d.eps'\n",(foldername).c_str(),j );
 		fprintf(gnuplotPipe, "set xlabel 'X '\n" );
 		fprintf(gnuplotPipe, "set ylabel 'Y '\n" );
 		fprintf(gnuplotPipe, "set ticslevel 0 \n" );
 		fprintf(gnuplotPipe, "set title 'Radial Distribution'; set pointsize 0.70; \n");
-		fprintf(gnuplotPipe, "plot '%s' u 2:1 w l lt 1 lc -1,'%s' u 2:1 w p pt 7 lc 1  \n",(foldername+str).c_str(),(foldername+str).c_str() );
+		fprintf(gnuplotPipe, "plot '%s' u 2:(-log($1)-log(4*pi*$2**2)+2.*exp(-$2**2/2./0.7/0.7)-0.0) w l lt 1 lc -1 t '','%s' u 2:(-log($1)-log(4*pi*$2**2)+2.*exp(-$2**2/2./0.7/0.7)-0.0) w p pt 7 lc 1 t ''  \n",(foldername+str).c_str(),(foldername+str).c_str() );
 		pclose(gnuplotPipe);
 
 }

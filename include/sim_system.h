@@ -65,6 +65,7 @@ class sim_system
 
         double recalc_energy_star_ll(int star_i, int pol_i, int mol_i); // calculatels energy when a molecule
                                                         //  within a polymer is specified
+        double recalc_nonbonded_star_ll(int star_i, int pol_i, int mol_i);
 
         double recalc_energy_pol_ll(int pol_i, int mol_i); //calculates energy of a molecule using linked lists
         double recalc_energy_pol_ll_3D(int pol_i, int mol_i);
@@ -72,6 +73,8 @@ class sim_system
         double extra_energy_pol();                         // general extra energy terms that can be added
                                                             // to apply constraints to the system
         double calc_total_energy();                         //calculates total energy of the system
+        double calc_total_nonbonded();
+	double recalc_nonbonded_ll();
         int move_pivot_pol( int );                          //attempt of a povit move
 
         int mc_step_mol( int );
@@ -82,7 +85,9 @@ class sim_system
         double mc_steps_pol_ll( int );
 
         int mc_step_star( int );
+        int move_pivot_star( int star_i);
         double mc_steps_star( int );
+	int move_COM_star( int star_i);
 
         int gnuplot(int j);
 
