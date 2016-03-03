@@ -56,6 +56,10 @@ double n0=0.0;
 double n_end=2.5;
 
 
+int N_arms1 = 2;
+int N_arms2 = 4;
+int N_monomers = 17;
+
 
 
 
@@ -94,7 +98,7 @@ int main(int argc, char* argv[]) {
 //  ofstream output;
 //	output.open( "output.dat" , ofstream::out | ofstream::trunc);
     char str0[80];
-    sprintf(str0,"N0_%f_End_%f",n0,n_end);
+    sprintf(str0,"Narm%d_%d_N%d_%f_End_%f",N_arms1,N_arms2,N_monomers,n0,n_end);
     foldername=foldername+str0;
     mkdir((foldername).c_str(),0777);
 	// freopen((foldername+"/output.dat").c_str(),"w",stdout);
@@ -142,7 +146,7 @@ int main(int argc, char* argv[]) {
      }
 
      polymer poly[N_polymers];
-     star    stars[N_stars];
+     star    stars[ ]={star(N_arms1,L/2.,L/2.,L/2.),star(N_arms2,L/2.,L/2.,L/2.+disntance_between_COM)};
 
 //     system initialization;
      sim_system sys;
@@ -163,19 +167,27 @@ int main(int argc, char* argv[]) {
         sys.poly[i].print();
      }
 
+    // setting stars
+    // for (int i = 0; i < N_arms; ++i)
+    // {
+    // 	sys.stars[0].poly[i].polymer_SAW(L/2.,L/2.,L/2.);
+    // 	sys.stars[1].poly[i].polymer_SAW(L/2.,L/2.,L/2.+disntance_between_COM);
+
+    // }
+
+
      for (int i=0;i<N_stars;i++){
         cout << i << endl;
         cout << "from system print" << endl;
         sys.stars[i].print();
      }
 
-     sys.stars[0].poly[0].polymer_SAW(L/2.,L/2.,L/2.);
-     sys.stars[0].poly[1].polymer_SAW(L/2.,L/2.,L/2.);
-     sys.stars[1].poly[0].polymer_SAW(L/2.,L/2.,L/2.+disntance_between_COM);
-     sys.stars[1].poly[1].polymer_SAW(L/2.,L/2.,L/2.+disntance_between_COM);
 
-     sys.create_particle_list();
-     molecule ** part_list = sys.mol_list;
+
+
+
+    sys.create_particle_list();
+    molecule ** part_list = sys.mol_list;
 
     //densities initialised to zero
 
@@ -338,10 +350,9 @@ int main(int argc, char* argv[]) {
 ////////////////////////////////////////////////////////////
    int nsteps = 3000; int ntimes=100000;
    // Generate configurations :
-	sys.stars[0].poly[0].polymer_SAW(L/2.,L/2.,L/2.);
-	sys.stars[0].poly[1].polymer_SAW(L/2.,L/2.,L/2.);
-	sys.stars[1].poly[0].polymer_SAW(L/2.,L/2.,L/2.+disntance_between_COM);
-	sys.stars[1].poly[1].polymer_SAW(L/2.,L/2.,L/2.+disntance_between_COM);
+ //   	star_id = -1;
+	// sys.stars[0] = star(N_arms,L/2.,L/2.,L/2.);
+	// sys.stars[1] = star(N_arms,L/2.,L/2.,L/2.+disntance_between_COM);
 
    // Equilibrate configuration
 	double acceptance = sys.mc_steps_star(100000);
@@ -377,6 +388,7 @@ int main(int argc, char* argv[]) {
 					cout<<"\t\t completion = " << j*100/ntimes << "% ; " << "; dist = " <<  pos2 << " ;Energy = " << pols_energy/(j+1) << " ;<z> = "<< stars[1].zc<<endl;
    					fflush(stdout);
    					plot_radius(hist_p,j+pid);
+   					sys.gnuplot(j+pid);
 		    	}
 			}
 			

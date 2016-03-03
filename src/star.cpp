@@ -36,7 +36,7 @@ star::star()
 
 }
 
-star::star(int N)
+star::star(int N, double x, double y, double z)
 {
     N_arms = N;
     poly = new polymer [N_arms];
@@ -46,9 +46,10 @@ star::star(int N)
 
     cout << "\ninit star ..." << endl;
 
-    //  set polymer coordinates to zero
+    //  set star coordinates to zero
     xc=yc=zc=0;
     for (int i = 0; i < N_arms; i++){
+    	poly[i].polymer_SAW(x,y,z);
         xc+=poly[i].xc; yc+=poly[i].yc ; zc+=poly[i].zc;
         }
 
@@ -85,7 +86,30 @@ void star::set_COM( double x ,double y ,double z ){
 }
 
 
+// connected to a central polymer
+// double star::bond_energy()
+// {
+//     double en = 0.0;
+//     for (int i = 0; i< N_arms;i++){
+//     	en 		 		   += poly[i].bond_energy();
+//     }
 
+//     /*the center of the star is the first polymer*/
+//     molecule mc 			= poly[0].M[(poly[0].N+1)/2] ; 
+//     double k 				= poly[0].k;
+//     double delta 			= poly[0].delta;
+
+
+//     for (int i = 1; i< N_arms;i++){
+//         molecule m_center   = poly[i].M[(poly[i].N+1)/2];  /* The central molecule to each polymer*/
+//         double d     	    = Distance(mc,m_center);
+//         en          	   += k*(d-delta)*(d-delta)*0.5;
+//     }
+//     //dtor
+//     return en;
+// }
+
+//connected by to the end of the first polymer
 double star::bond_energy()
 {
     double en = 0.0;
@@ -94,13 +118,13 @@ double star::bond_energy()
     }
 
     /*the center of the star is the first polymer*/
-    molecule mc 			= poly[0].M[(poly[0].N+1)/2] ; 
+    molecule mc 			= poly[0].M[0] ; 
     double k 				= poly[0].k;
     double delta 			= poly[0].delta;
 
 
     for (int i = 1; i< N_arms;i++){
-        molecule m_center   = poly[i].M[(poly[i].N+1)/2];  /* The central molecule to each polymer*/
+        molecule m_center   = poly[i].M[0];  /* The central molecule to each polymer*/
         double d     	    = Distance(mc,m_center);
         en          	   += k*(d-delta)*(d-delta)*0.5;
     }
@@ -109,19 +133,44 @@ double star::bond_energy()
 }
 
 
+//connected to the center of the polymer
+// double star::bond_energy(int i /*polymer index*/,int j /* monomer index*/)
+// {
+//     double en = 0.0;
+//     en 		 += poly[i].bond_energy(j);
+
+//         /*the center of the star is the first polymer*/
+//     molecule mc 			= poly[0].M[(poly[0].N+1)/2] ; 
+//     double k 				= poly[0].k;
+//     double delta 			= poly[0].delta;
+
+
+//     for (int i = 1; i< N_arms;i++){
+//         molecule m_center   = poly[i].M[(poly[i].N+1)/2];  /* The central molecule to each polymer*/
+//         double d     	    = Distance(mc,m_center);
+//         en          	   += k*(d-delta)*(d-delta)*0.5;
+//     }
+//     //dtor
+//     return en;
+
+// }
+
+
+
+//connected by ends
 double star::bond_energy(int i /*polymer index*/,int j /* monomer index*/)
 {
     double en = 0.0;
     en 		 += poly[i].bond_energy(j);
 
         /*the center of the star is the first polymer*/
-    molecule mc 			= poly[0].M[(poly[0].N+1)/2] ; 
+    molecule mc 			= poly[0].M[0] ; 
     double k 				= poly[0].k;
     double delta 			= poly[0].delta;
 
 
     for (int i = 1; i< N_arms;i++){
-        molecule m_center   = poly[i].M[(poly[i].N+1)/2];  /* The central molecule to each polymer*/
+        molecule m_center   = poly[i].M[0];  /* The central molecule to each polymer*/
         double d     	    = Distance(mc,m_center);
         en          	   += k*(d-delta)*(d-delta)*0.5;
     }

@@ -1107,8 +1107,8 @@ double sim_system::mc_steps_star(int Nsteps){
     int success2 = 0;
     int success3 = 0;
 
-    double p_pivot = 0.03;
-    double p_COM   = 0.03;
+    double p_pivot = 0.0;
+    double p_COM   = 0.0;
 
     for (int i = 0; i < Nsteps; i++)
         {

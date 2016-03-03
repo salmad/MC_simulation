@@ -50,5 +50,9 @@ extern double disntance_between_COM;
 extern double n0;
 extern double n_end;
 
+extern int N_arms1;
+extern int N_arms2;
+extern int N_monomers;
+
 
 #endif // GLOBAL_H_INCLUDED
