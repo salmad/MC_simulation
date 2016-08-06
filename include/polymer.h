@@ -30,6 +30,7 @@ class polymer
         void polymer_SAW( double x, double y, double z);
         void displace( double dx ,double dy ,double dz );
         void set_COM( double x ,double y ,double z );
+        void set_N(int Nset );
 
         // turns a polymer chain using ith atom as pivot by angle=angle;
         // the axes of rotation is set by phi and theta

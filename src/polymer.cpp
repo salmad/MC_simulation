@@ -66,6 +66,27 @@ polymer::polymer(int Nset /*double q , other parameters can be included to set u
 
 }
 
+void polymer::set_N(int Nset /*double q , other parameters can be included to set up polymer*/)
+{
+    N = Nset;
+    delete [] M;
+    M = new molecule [N];
+
+    cout << "\n polymer: reset N..." << endl;
+
+//  set polymer coordinates to zero
+    xc=yc=zc=0;
+    for (int i = 0; i < N; i++){
+//        M[i] = molecule();
+        M[i].q=0.0;
+        M[i].type=1;
+        //center of mass initialization
+        xc+=M[i].x; yc+=M[i].y ; zc+=M[i].z;
+        }
+
+    xc/=(1.0*N);yc/=(1.0*N);zc/=(1.0*N);
+
+}
 
 double polymer::mindist( )
 {
@@ -323,22 +344,22 @@ void polymer::pivot_turn(int i, double phi, double theta, double angle){
     double Rzy = uy*uz*(1-cosine) + ux*sine;
     double Rzz = cosine + uz*uz*(1-cosine);
 
-    if (i<N/2)
-    {
-        for (int j = 0; j < i; j++)
-        {
-//        eold_s          += recalc_energy_pol(pol_ind,i);
-            molecule  * turned;
-            turned = &(M[j]);
-            double x         = pivot->x + (turned->x-pivot->x)*Rxx+(turned->y-pivot->y)*Rxy+(turned->z-pivot->z)*Rxz;
-            double y         = pivot->y + (turned->x-pivot->x)*Ryx+(turned->y-pivot->y)*Ryy+(turned->z-pivot->z)*Ryz;
-            double z         = pivot->z + (turned->x-pivot->x)*Rzx+(turned->y-pivot->y)*Rzy+(turned->z-pivot->z)*Rzz;;
-            M[j].move_to_position(x,y,z);
-        }
-    }
+//     if (i<N/2)
+//     {
+//         for (int j = 0; j < i; j++)
+//         {
+// //        eold_s          += recalc_energy_pol(pol_ind,i);
+//             molecule  * turned;
+//             turned = &(M[j]);
+//             double x         = pivot->x + (turned->x-pivot->x)*Rxx+(turned->y-pivot->y)*Rxy+(turned->z-pivot->z)*Rxz;
+//             double y         = pivot->y + (turned->x-pivot->x)*Ryx+(turned->y-pivot->y)*Ryy+(turned->z-pivot->z)*Ryz;
+//             double z         = pivot->z + (turned->x-pivot->x)*Rzx+(turned->y-pivot->y)*Rzy+(turned->z-pivot->z)*Rzz;;
+//             M[j].move_to_position(x,y,z);
+//         }
+//     }
 
-    if (i>N/2)
-    {
+    // if (i>N/2)
+    // {
         for (int j = i+1; j < N; j++)
         {
 //        eold_s          += recalc_energy_pol(pol_ind,i);
@@ -349,7 +370,7 @@ void polymer::pivot_turn(int i, double phi, double theta, double angle){
             double z         = pivot->z + (turned->x-pivot->x)*Rzx+(turned->y-pivot->y)*Rzy+(turned->z-pivot->z)*Rzz;;
             M[j].move_to_position(x,y,z);
         }
-    }
+    // }
 
 
 }

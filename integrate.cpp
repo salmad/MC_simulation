@@ -311,11 +311,21 @@ void plot_radius(int  counts[], int j){
 	radius_file.open( (foldername+str).c_str() , ofstream::out | ofstream::trunc);
 	double dr = abs(n_end-n0)/nbins;
 	for(int i=0;i<nbins;i++){
-	   	radius_file << (double)counts[i]/4.0/M_PI/((1.0+i)*dr)/((1.0+i)*dr)/(dr)/(j+1) << "  " << (double)(1.0+i)*dr  << endl;
+		double rc = (double)(1.0+i)*dr;
+		double prob = (double)counts[i]/4.0/M_PI/rc/rc/(dr)/(j+1);
+		double e = 0;
+		e = -log(prob);
+		e += A_gauss*exp(-rc*rc/0.5/0.5/2.);
+    	e += -exp(500.*(rc-n_end));
+    	e += -log(4*M_PI*rc*rc);
+    	// cout <<  rc << "  " << prob << "  " << e << " " << counts[i] << endl;
+	   	radius_file << rc << "  " << prob << "  " << e << " " << counts[i] << endl;
 	    }
     radius_file.close();
 
 	//	    char * commandsForGnuplot[] = {"set title 'Graph'; set pointsize 0.5;set view equal xyz", " "};
+
+
 
 
 		    FILE * gnuplotPipe = popen ("gnuplot -persistent", "w");
@@ -326,7 +336,7 @@ void plot_radius(int  counts[], int j){
 		fprintf(gnuplotPipe, "set ylabel 'Y '\n" );
 		fprintf(gnuplotPipe, "set ticslevel 0 \n" );
 		fprintf(gnuplotPipe, "set title 'Radial Distribution'; set pointsize 0.70; \n");
-		fprintf(gnuplotPipe, "plot '%s' u 2:(-log($1)-log(4*pi*$2**2)+2.*exp(-$2**2/2./0.7/0.7)-0.0) w l lt 1 lc -1 t '','%s' u 2:(-log($1)-log(4*pi*$2**2)+2.*exp(-$2**2/2./0.7/0.7)-0.0) w p pt 7 lc 1 t ''  \n",(foldername+str).c_str(),(foldername+str).c_str() );
+		fprintf(gnuplotPipe, "plot '%s' u 1:3 w l lt 1 lc -1 t '','%s' u 1:3:(3./($4-1.)) w errorbars pt 7 lc 1 t ''  \n",(foldername+str).c_str(),(foldername+str).c_str() );
 		pclose(gnuplotPipe);
 
 }

@@ -52,7 +52,10 @@ extern double n_end;
 
 extern int N_arms1;
 extern int N_arms2;
+// extern int N_monomers1[N_arms1];
+// extern int N_monomers2[N_arms2];
 extern int N_monomers;
+extern double A_gauss;
 
 
 #endif // GLOBAL_H_INCLUDED

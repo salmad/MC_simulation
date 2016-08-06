@@ -18,7 +18,9 @@ class star
 
 		star();
 		star( int N_arms , double x , double y, double z);
-
+		
+		void set_arms(int N, int* N_pol, double x, double y, double z);
+		
 		void displace( double dx ,double dy ,double dz );
 		void set_COM( double x ,double y ,double z );
 		void update_COM();

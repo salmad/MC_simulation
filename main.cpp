@@ -23,7 +23,7 @@ using namespace std;
 //time_step
 extern string foldername="polymer_";
 const double time_step = 0.25;
-const int nbins=100;
+const int nbins=80;
 //Droplet size
 const int geometry=0;  // 0 if cubic , 1 if spherical
 const double L = 20.; // Nanometers
@@ -51,14 +51,17 @@ const double lj_shift_cations=0.25;
 const double kT=1.0;
 const double lambda=10.0;
 double k=200.0;
-double disntance_between_COM = 2.0;
+double disntance_between_COM = 0.50;
 double n0=0.0;
-double n_end=2.5;
+double n_end=2.;
 
 
 int N_arms1 = 2;
-int N_arms2 = 4;
+int N_arms2 = 2;
+int N_pols1[N_arms1] = {10,10};
+int N_pols2[N_arms2] = {50,50};
 int N_monomers = 17;
+double A_gauss = 0.65*N_arms1*N_arms2;
 
 
 
@@ -348,7 +351,7 @@ int main(int argc, char* argv[]) {
 
 
 ////////////////////////////////////////////////////////////
-   int nsteps = 3000; int ntimes=100000;
+   int nsteps = 9000; int ntimes=25000;
    // Generate configurations :
  //   	star_id = -1;
 	// sys.stars[0] = star(N_arms,L/2.,L/2.,L/2.);
@@ -374,7 +377,7 @@ int main(int argc, char* argv[]) {
        stars[0].update_COM();
        stars[1].update_COM();
        // Data after equilibration
-       pos2     = sqrt((stars[1].xc-L/2.)*(stars[1].xc-L/2.)+(stars[1].yc-L/2.)*(stars[1].yc-L/2.)+(stars[1].zc-L/2.)*(stars[1].zc-L/2.));
+       pos2     = sqrt((stars[1].xc-stars[0].xc)*(stars[1].xc-stars[0].xc)+(stars[1].yc-stars[0].yc)*(stars[1].yc-stars[0].yc)+(stars[1].zc-stars[0].zc)*(stars[1].zc-stars[0].zc));
        hist_p[int(pos2/abs(n_end-n0)*nbins)]++;
        pols_energy += sys.calc_total_energy();
 
@@ -395,6 +398,7 @@ int main(int argc, char* argv[]) {
 
 			MPI_Allreduce(&hist_p, &hist, nbins, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
 			plot_radius(hist,j+np);
+			sys.gnuplot(j+np);
 		}
 
     }
@@ -403,7 +407,7 @@ int main(int argc, char* argv[]) {
    	plot_radius(hist,ntimes+1);
 
     return_molecules(M);
-    sys.gnuplot(1);
+    sys.gnuplot(ntimes+1);
 
     int stop_s=clock();
     cout << "time: " << (stop_s-start_s)/double(CLOCKS_PER_SEC) << " sec"<< endl;

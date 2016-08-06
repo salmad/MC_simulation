@@ -57,6 +57,36 @@ star::star(int N, double x, double y, double z)
 
 }
 
+
+void star::set_arms(int N, int *N_pol, double x, double y, double z)
+{
+    N_arms = N;
+ 
+
+    for (int i = 0; i < N_arms; i++)
+    {
+        poly[i].set_N(N_pol[i]);
+        cout << "from star printing arm monomers :  Npol = " << N_pol[i] << endl;  
+    }
+
+    star_id++;
+    id = star_id;
+
+    cout << "\ninit star ..." << endl;
+
+    //  set star coordinates to zero
+    xc=yc=zc=0;
+    for (int i = 0; i < N_arms; i++){
+
+        poly[i].polymer_SAW(x,y,z);
+
+        xc+=poly[i].xc; yc+=poly[i].yc ; zc+=poly[i].zc;
+        }
+    xc/=(1.0*N_arms);yc/=(1.0*N_arms);zc/=(1.0*N_arms);
+    cout << "\ninit star ... Narms = " << N_arms << " Npol = " << N_pol[0] <<" " << N_pol[1] << endl;
+}
+
+
 void star::displace( double dx, double dy, double dz)
 {
     for (int i = 0; i < N_arms; ++i)
@@ -163,17 +193,33 @@ double star::bond_energy(int i /*polymer index*/,int j /* monomer index*/)
     double en = 0.0;
     en 		 += poly[i].bond_energy(j);
 
-        /*the center of the star is the first polymer*/
-    molecule mc 			= poly[0].M[0] ; 
-    double k 				= poly[0].k;
-    double delta 			= poly[0].delta;
 
 
-    for (int i = 1; i< N_arms;i++){
+
+    if (j==0 && i>0 )
+    {
+                /*the center of the star is the first polymer*/
+        molecule mc             = poly[0].M[0] ; 
+        double k                = poly[0].k;
+        double delta            = poly[0].delta;
+
         molecule m_center   = poly[i].M[0];  /* The central molecule to each polymer*/
-        double d     	    = Distance(mc,m_center);
-        en          	   += k*(d-delta)*(d-delta)*0.5;
+        double d            = Distance(mc,m_center);
+        en                 += k*(d-delta)*(d-delta)*0.5;
+    } 
+
+    if (i==0 && j==0)
+    {
+        molecule mc              = poly[0].M[0] ; 
+        double k                 = poly[0].k;
+        double delta             = poly[0].delta;
+        for (int l = 1; l< N_arms;l++){
+            molecule m_first    = poly[l].M[0];  /* The central molecule to each polymer*/
+            double d             = Distance(mc,m_first);
+            en                  += k*(d-delta)*(d-delta)*0.5;
+        }
     }
+
     //dtor
     return en;
 

@@ -204,44 +204,45 @@ double sim_system::recalc_energy_star_ll(int star_i, int pol_i, int mol_i)
     double e        = 0.0;
     molecule m1     = stars[star_i].poly[pol_i].M[mol_i];
     int id1         = stars[star_i].poly[pol_i].M[mol_i].id;
-    int icell       = int((m1.z)/dd.cell_size);
+    int icell       = int(floor(m1.z /dd.cell_size)) % dd.n;
+    if (icell < 0) icell += dd.n;
 
 
     // calculate non-bonded part
     create1D_linked_list();
     //run through neigbouring cells
-    if (icell>0)
+
+    // previous cell
+    int jcell = (icell-1) % dd.n; //neighboring cell
+    if (jcell < 0) jcell += dd.n;
+    int id2 = dd.hoc[jcell]; //take the hoc of cell
+
+    while (id2 != -1)
     {
-        int jcell = icell-1; //neighboring cell
-        int id2 = dd.hoc[jcell]; //take the hoc of cell
-
-        while (id2 != -1)
-        {
-            molecule m2 = *mol_list[id2];
-            e += lj_energy(m1,m2);
+        molecule m2 = *mol_list[id2];
+        e += lj_energy(m1,m2);
 //cout << "1 icell "<<icell << " jcell "<< jcell << " e = "<< e << " id " << id1 << " "<< id2  << " D "<< Distance(m1,m2)<< endl;
-            id2 = dd.linked_list[id2];
-        }
-
+        id2 = dd.linked_list[id2];
     }
 
-    if (icell<dd.ncells-1 )
+
+
+    jcell = (icell+1) % dd.n; //neighboring cell
+    if (jcell < 0) jcell += dd.n;
+    id2 = dd.hoc[jcell]; //take the hoc of cell
+    while (id2 != -1)
     {
-        int jcell = icell+1; //neighboring cell
-        int id2 = dd.hoc[jcell]; //take the hoc of cell
-        while (id2 != -1)
-        {
-            molecule m2 = *mol_list[id2];
-            e += lj_energy(m1,*mol_list[id2]);
+        molecule m2 = *mol_list[id2];
+        e += lj_energy(m1,*mol_list[id2]);
 //cout << "2 icell "<<icell << " jcell "<< jcell << " e = "<< e << " id " << id1 << " "<< id2  << " D "<< Distance(m1,m2)<< endl;
 
-            id2 = dd.linked_list[id2];
+        id2 = dd.linked_list[id2];
 
-        }
     }
 
-    int jcell = icell; //neighboring cell
-    int id2 = dd.hoc[jcell]; //take the hoc of cell
+
+    jcell = icell; //neighboring cell
+    id2 = dd.hoc[jcell]; //take the hoc of cell
 
     while (id2 != -1)
     {
@@ -330,11 +331,6 @@ double sim_system::recalc_nonbonded_ll()
             id2 = dd.linked_list[id2];
 
         }
-
-
-
-
-
     }
 
     return e;
@@ -404,44 +400,39 @@ double sim_system::recalc_nonbonded_star_ll(int star_i, int pol_i, int mol_i)
     double e        = 0.0;
     molecule m1     = stars[star_i].poly[pol_i].M[mol_i];
     int id1         = stars[star_i].poly[pol_i].M[mol_i].id;
-    int icell       = int((m1.z)/dd.cell_size);
-
+    int icell       = int(floor(m1.z /dd.cell_size)) % dd.n;
+    if (icell < 0) icell += dd.n;
 
     // calculate non-bonded part
     create1D_linked_list();
     //run through neigbouring cells
-    if (icell>0)
-    {
-        int jcell = icell-1; //neighboring cell
-        int id2 = dd.hoc[jcell]; //take the hoc of cell
-
-        while (id2 != -1)
-        {
-            molecule m2 = *mol_list[id2];
-            e += lj_energy(m1,m2);
-//cout << "1 icell "<<icell << " jcell "<< jcell << " e = "<< e << " id " << id1 << " "<< id2  << " D "<< Distance(m1,m2)<< endl;
-            id2 = dd.linked_list[id2];
-        }
-
-    }
-
-    if (icell<dd.ncells-1 )
-    {
-        int jcell = icell+1; //neighboring cell
-        int id2 = dd.hoc[jcell]; //take the hoc of cell
-        while (id2 != -1)
-        {
-            molecule m2 = *mol_list[id2];
-            e += lj_energy(m1,*mol_list[id2]);
-//cout << "2 icell "<<icell << " jcell "<< jcell << " e = "<< e << " id " << id1 << " "<< id2  << " D "<< Distance(m1,m2)<< endl;
-
-            id2 = dd.linked_list[id2];
-
-        }
-    }
-
-    int jcell = icell; //neighboring cell
+    int jcell = (icell-1) % dd.n; //neighboring cell
+    if (jcell < 0) jcell += dd.n;
     int id2 = dd.hoc[jcell]; //take the hoc of cell
+
+    while (id2 != -1)
+    {
+        molecule m2 = *mol_list[id2];
+        e += lj_energy(m1,m2);
+//cout << "1 icell "<<icell << " jcell "<< jcell << " e = "<< e << " id " << id1 << " "<< id2  << " D "<< Distance(m1,m2)<< endl;
+        id2 = dd.linked_list[id2];
+    }
+
+
+    jcell = (icell+1) % dd.n; //neighboring cell
+    if (jcell < 0) jcell += dd.n;
+    id2 = dd.hoc[jcell]; //take the hoc of cell
+    while (id2 != -1)
+    {
+        // molecule m2 = *mol_list[id2];
+        e += lj_energy(m1,*mol_list[id2]);
+        id2 = dd.linked_list[id2];
+
+    }
+
+
+    jcell = icell; //neighboring cell
+    id2 = dd.hoc[jcell]; //take the hoc of cell
 
     while (id2 != -1)
     {
@@ -453,10 +444,6 @@ double sim_system::recalc_nonbonded_star_ll(int star_i, int pol_i, int mol_i)
         id2 = dd.linked_list[id2];
 
     }
-
-
-
-
 
     return e;
 }
@@ -573,6 +560,7 @@ int sim_system::create_particle_list()
     {
         max_part_id ++;
         //mol_list[i] = new molecule;
+        M[i].id  = max_part_id;
         mol_list[i] = &M[i];
 
     }
@@ -588,6 +576,7 @@ int sim_system::create_particle_list()
             cout << "mol_list = " << max_part_id << endl;
             //mol_list[max_part_id] = new molecule;
 //            molecule m_tmp = poly[i].M[j];
+            poly[i].M[j].id = max_part_id;
             mol_list[max_part_id] = &(poly[i].M[j]);
 
         }
@@ -608,6 +597,7 @@ int sim_system::create_particle_list()
                 cout << "mol_list = " << max_part_id << endl;
                 //mol_list[max_part_id] = new molecule;
     //            molecule m_tmp = poly[i].M[j];
+                stars[i].poly[j].M[k].id = max_part_id;
                 mol_list[max_part_id] = &(stars[i].poly[j].M[k]);
             }
 
@@ -678,10 +668,11 @@ double sim_system::extra_energy_pol()
 //    poly[1].update_COM();
     // e += 50.0*((poly[1].xc-L/2.)*(poly[1].xc-L/2.)+(poly[1].yc-L/2.)*(poly[1].yc-L/2.)+(poly[1].zc-L/2.)*(poly[1].zc-L/2.));
     
-    double rc = sqrt((stars[1].xc-L/2.)*(stars[1].xc-L/2.)+(stars[1].yc-L/2.)*(stars[1].yc-L/2.)+(stars[1].zc-L/2.)*(stars[1].zc-L/2.));
-    e += -2.*exp(-rc*rc/0.7/0.7/2.);
+    double rc = sqrt((stars[1].xc-stars[0].xc)*(stars[1].xc-stars[0].xc)+(stars[1].yc-stars[0].yc)*(stars[1].yc-stars[0].yc)+(stars[1].zc-stars[0].zc)*(stars[1].zc-stars[0].zc));
+    e += -1.*A_gauss*exp(-rc*rc/0.5/0.5/2.);
     e += exp(500.*(rc-n_end));
     // e += exp(500.*(n0-rc));
+    // e += 2.0*log(rc+1);
     e += log(4*M_PI*rc*rc);
 
 //    poly[2].update_COM();
@@ -1107,8 +1098,8 @@ double sim_system::mc_steps_star(int Nsteps){
     int success2 = 0;
     int success3 = 0;
 
-    double p_pivot = 0.0;
-    double p_COM   = 0.0;
+    double p_pivot = 0.004;
+    double p_COM   = 0.005;
 
     for (int i = 0; i < Nsteps; i++)
         {
@@ -1116,7 +1107,7 @@ double sim_system::mc_steps_star(int Nsteps){
             if (drand48()<1-p_pivot - p_COM)
                     { success1 += mc_step_star(index);}
             else if (drand48() < 1 - p_COM)   { success2 += move_pivot_star(index); }
-            else    {success3 += move_COM_star(index);}
+            else    {success3 += move_COM_star(1);}
         }
 
     // cout << " local move p = " << (double)success1/Nsteps/(1.-p_pivot) << " pivot move p = " << (double)success2/p_pivot/Nsteps <<  endl;
