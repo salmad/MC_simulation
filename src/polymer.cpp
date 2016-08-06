@@ -16,7 +16,7 @@ using namespace std;
 
 polymer::polymer()
 {
-    N = 50;
+    N = N_monomers;
     M = new molecule [N];
 //    molecule m2[N];
 //    M = m1 ;//ctor
@@ -66,6 +66,27 @@ polymer::polymer(int Nset /*double q , other parameters can be included to set u
 
 }
 
+void polymer::set_N(int Nset /*double q , other parameters can be included to set up polymer*/)
+{
+    N = Nset;
+    delete [] M;
+    M = new molecule [N];
+
+    cout << "\n polymer: reset N..." << endl;
+
+//  set polymer coordinates to zero
+    xc=yc=zc=0;
+    for (int i = 0; i < N; i++){
+//        M[i] = molecule();
+        M[i].q=0.0;
+        M[i].type=1;
+        //center of mass initialization
+        xc+=M[i].x; yc+=M[i].y ; zc+=M[i].z;
+        }
+
+    xc/=(1.0*N);yc/=(1.0*N);zc/=(1.0*N);
+
+}
 
 double polymer::mindist( )
 {
@@ -134,7 +155,7 @@ void polymer::polymer_RW_WI( double x, double y, double z)
 
         polymer::update_COM();
 
-        polymer::displace_polymer(x-xc,y-yc,z-zc);
+        polymer::displace(x-xc,y-yc,z-zc);
 
         min_dist = polymer::mindist( );
     }
@@ -171,7 +192,7 @@ void polymer::polymer_SAW( double x, double y, double z)
 
         polymer::update_COM();
 
-        polymer::displace_polymer(x-xc,y-yc,z-zc);
+        polymer::displace(x-xc,y-yc,z-zc);
 
         min_dist = polymer::mindist( );
         cout << "Mindist = "<<min_dist << endl;
@@ -179,20 +200,12 @@ void polymer::polymer_SAW( double x, double y, double z)
 
 }
 
-void polymer::displace_polymer( double x, double y, double z)
+void polymer::displace( double dx, double dy, double dz)
 {
     for (int i = 0; i < N; ++i)
-    {
+        M[i].displace(dx,dy,dz);
 
-        M[i].x+=x;
-        M[i].y+=y;
-        M[i].z+=z;
-//            if (geometry == 0){
-//    if (x>L){x-=L;} else if (x<0.0){x+=L;}
-//    if (y>L){y-=L;} else if (y<0.0){y+=L;}
-//    if (z>L){z-=L;} else if (z<0.0){z+=L;}}
-    }
-    xc+=x; yc+=y ; zc+=z;
+    xc+=dx; yc+=dy ; zc+=dz;
 }
 
 
@@ -227,8 +240,15 @@ void polymer::polymer_RW( double x, double y, double z)
 
     polymer::update_COM();
 
-    polymer::displace_polymer(x-xc,y-yc,z-zc);
+    polymer::displace(x-xc,y-yc,z-zc);
 
+
+}
+
+void polymer::set_COM( double x, double y, double z)
+{
+    polymer::update_COM();
+    polymer::displace(x-xc,y-yc,z-zc);
 
 }
 
@@ -297,6 +317,61 @@ double polymer::bond_energy(int j)
         en                 += (k*(d1-delta)*(d1-delta)*0.5+k*(d2-delta)*(d2-delta)*0.5);
         return en;
     }
+
+}
+
+void polymer::pivot_turn(int i, double phi, double theta, double angle){
+
+    double ux   = sin(theta)*cos(phi);
+    double uy   = sin(theta)*sin(phi);
+    double uz   = cos(theta);
+
+    molecule * pivot;
+    pivot = &(M[i]);
+
+    double cosine = cos(angle);
+    double sine = sin(angle);
+//  initialize rotation matrix
+    double Rxx = cosine + ux*ux*(1-cosine);
+    double Rxy = ux*uy*(1-cosine) - uz*sine;
+    double Rxz = ux*uz*(1-cosine) + uy*sine;
+
+    double Ryx = ux*uy*(1-cosine) + uz*sine;
+    double Ryy = cosine + uy*uy*(1-cosine);
+    double Ryz = uy*uz*(1-cosine) - ux*sine;
+
+    double Rzx = ux*uz*(1-cosine) - uy*sine;
+    double Rzy = uy*uz*(1-cosine) + ux*sine;
+    double Rzz = cosine + uz*uz*(1-cosine);
+
+//     if (i<N/2)
+//     {
+//         for (int j = 0; j < i; j++)
+//         {
+// //        eold_s          += recalc_energy_pol(pol_ind,i);
+//             molecule  * turned;
+//             turned = &(M[j]);
+//             double x         = pivot->x + (turned->x-pivot->x)*Rxx+(turned->y-pivot->y)*Rxy+(turned->z-pivot->z)*Rxz;
+//             double y         = pivot->y + (turned->x-pivot->x)*Ryx+(turned->y-pivot->y)*Ryy+(turned->z-pivot->z)*Ryz;
+//             double z         = pivot->z + (turned->x-pivot->x)*Rzx+(turned->y-pivot->y)*Rzy+(turned->z-pivot->z)*Rzz;;
+//             M[j].move_to_position(x,y,z);
+//         }
+//     }
+
+    // if (i>N/2)
+    // {
+        for (int j = i+1; j < N; j++)
+        {
+//        eold_s          += recalc_energy_pol(pol_ind,i);
+            molecule  * turned;
+            turned = &(M[j]);
+            double x         = pivot->x + (turned->x-pivot->x)*Rxx+(turned->y-pivot->y)*Rxy+(turned->z-pivot->z)*Rxz;
+            double y         = pivot->y + (turned->x-pivot->x)*Ryx+(turned->y-pivot->y)*Ryy+(turned->z-pivot->z)*Ryz;
+            double z         = pivot->z + (turned->x-pivot->x)*Rzx+(turned->y-pivot->y)*Rzy+(turned->z-pivot->z)*Rzz;;
+            M[j].move_to_position(x,y,z);
+        }
+    // }
+
 
 }
 

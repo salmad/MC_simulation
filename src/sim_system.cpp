@@ -2,6 +2,7 @@
 #include "../global.h"
 #include "../molecule.h"
 #include "../include/polymer.h"
+#include "../include/star.h"
 #include "../include/integrate.h"
 
 # include <vector>
@@ -32,6 +33,7 @@ sim_system::sim_system()
 {
     M = NULL;
     poly = NULL;
+    stars = NULL;
     other = NULL;
     // change list into list of references
     mol_list = new molecule * [MAX_PART];  //molecule[MAX_PART];
@@ -131,7 +133,7 @@ void sim_system::create3D_linked_list()
 }
 
 //energy using cell list
-double sim_system::recalc_energy_pol_ll(int pol_i, int mol_i)
+double sim_system::recalc_energy_pol_ll( int pol_i, int mol_i)
 {
     double e        = 0.0;
     molecule m1     = poly[pol_i].M[mol_i];
@@ -196,6 +198,255 @@ double sim_system::recalc_energy_pol_ll(int pol_i, int mol_i)
     return e;
 }
 
+//energy using cell list
+double sim_system::recalc_energy_star_ll(int star_i, int pol_i, int mol_i)
+{
+    double e        = 0.0;
+    molecule m1     = stars[star_i].poly[pol_i].M[mol_i];
+    int id1         = stars[star_i].poly[pol_i].M[mol_i].id;
+    int icell       = int(floor(m1.z /dd.cell_size)) % dd.n;
+    if (icell < 0) icell += dd.n;
+
+
+    // calculate non-bonded part
+    create1D_linked_list();
+    //run through neigbouring cells
+
+    // previous cell
+    int jcell = (icell-1) % dd.n; //neighboring cell
+    if (jcell < 0) jcell += dd.n;
+    int id2 = dd.hoc[jcell]; //take the hoc of cell
+
+    while (id2 != -1)
+    {
+        molecule m2 = *mol_list[id2];
+        e += lj_energy(m1,m2);
+//cout << "1 icell "<<icell << " jcell "<< jcell << " e = "<< e << " id " << id1 << " "<< id2  << " D "<< Distance(m1,m2)<< endl;
+        id2 = dd.linked_list[id2];
+    }
+
+
+
+    jcell = (icell+1) % dd.n; //neighboring cell
+    if (jcell < 0) jcell += dd.n;
+    id2 = dd.hoc[jcell]; //take the hoc of cell
+    while (id2 != -1)
+    {
+        molecule m2 = *mol_list[id2];
+        e += lj_energy(m1,*mol_list[id2]);
+//cout << "2 icell "<<icell << " jcell "<< jcell << " e = "<< e << " id " << id1 << " "<< id2  << " D "<< Distance(m1,m2)<< endl;
+
+        id2 = dd.linked_list[id2];
+
+    }
+
+
+    jcell = icell; //neighboring cell
+    id2 = dd.hoc[jcell]; //take the hoc of cell
+
+    while (id2 != -1)
+    {
+        if(id1!=id2)
+        {
+            e += lj_energy(m1,*mol_list[id2]);
+//cout << "3 icell "<<icell << " jcell "<< jcell << " e = "<< e << " id " << id1 << " "<< id2  << " D "<< Distance(m1,*mol_list[id2])<< endl;
+        }
+        id2 = dd.linked_list[id2];
+
+    }
+
+    // go through bonded ... to be done
+
+    e += stars[star_i].bond_energy(pol_i, mol_i);
+    // we can add some extra energies if necessary, e.g.
+    e += sim_system::extra_energy_pol();
+
+    return e;
+}
+
+
+double sim_system::recalc_nonbonded_ll()
+{
+
+    double e = 0.0;
+    // nonbonded part
+    for(int i=0;i<max_part_id;i++){
+        molecule m1     = *mol_list[i];
+        //e+=constraint_energy(m1);
+        int id1         = m1.id;
+        int icell       = int(floor(m1.z /dd.cell_size)) % dd.n;
+        if (icell < 0) icell += dd.n;
+
+
+        // calculate non-bonded part
+        create1D_linked_list();
+        //run through neigbouring cells
+
+    // previous cell
+        int jcell = (icell-1) % dd.n; //neighboring cell
+        if (jcell < 0) jcell += dd.n;
+        int id2 = dd.hoc[jcell]; //take the hoc of cell
+        while (id2 != -1)
+        {
+            molecule m2 = *mol_list[id2];
+            if(id2>id1)
+            {
+                e += lj_energy(m1,*mol_list[id2]);
+            }
+    //cout << "1 icell "<<icell << " jcell "<< jcell << " e = "<< e << " id " << id1 << " "<< id2  << " D "<< Distance(m1,m2)<< endl;
+            id2 = dd.linked_list[id2];
+            }
+
+
+
+
+        jcell = (icell+1) % dd.n; //neighboring cell
+        if (jcell < 0) jcell += dd.n;
+        id2 = dd.hoc[jcell]; //take the hoc of cell
+        while (id2 != -1)
+        {
+            molecule m2 = *mol_list[id2];
+            if(id2>id1)
+            {
+                e += lj_energy(m1,*mol_list[id2]);
+    //cout << "3 icell "<<icell << " jcell "<< jcell << " e = "<< e << " id " << id1 << " "<< id2  << " D "<< Distance(m1,*mol_list[id2])<< endl;
+            }
+    //cout << "2 icell "<<icell << " jcell "<< jcell << " e = "<< e << " id " << id1 << " "<< id2  << " D "<< Distance(m1,m2)<< endl;
+
+            id2 = dd.linked_list[id2];
+
+        }
+
+
+        jcell = icell; //neighboring cell
+        id2 = dd.hoc[jcell]; //take the hoc of cell
+
+        while (id2 != -1)
+        {
+            if(id2>id1)
+            {
+                e += lj_energy(m1,*mol_list[id2]);
+    //cout << "3 icell "<<icell << " jcell "<< jcell << " e = "<< e << " id " << id1 << " "<< id2  << " D "<< Distance(m1,*mol_list[id2])<< endl;
+            }
+            id2 = dd.linked_list[id2];
+
+        }
+    }
+
+    return e;
+}
+
+
+double sim_system::recalc_nonbonded_star_ll(int star_i, int pol_i, int mol_i)
+{
+//     double e        = 0.0;
+//     molecule m1     = stars[star_i].poly[pol_i].M[mol_i];
+//     int id1         = stars[star_i].poly[pol_i].M[mol_i].id;
+//     int icell       = int(floor(m1.z /dd.cell_size)) % dd.n;
+//     if (icell < 0) icell += dd.n;
+
+
+//     // calculate non-bonded part
+//     create1D_linked_list();
+//     //run through neigbouring cells
+
+// // previous cell
+//     int jcell = (icell-1) % dd.n; //neighboring cell
+//     if (jcell < 0) jcell += dd.n;
+//     int id2 = dd.hoc[jcell]; //take the hoc of cell
+//     while (id2 != -1)
+//     {
+//         molecule m2 = *mol_list[id2];
+//         e += lj_energy(m1,m2);
+// //cout << "1 icell "<<icell << " jcell "<< jcell << " e = "<< e << " id " << id1 << " "<< id2  << " D "<< Distance(m1,m2)<< endl;
+//         id2 = dd.linked_list[id2];
+//         }
+
+
+
+
+//     jcell = (icell+1) % dd.n; //neighboring cell
+//     if (jcell < 0) jcell += dd.n;
+//     id2 = dd.hoc[jcell]; //take the hoc of cell
+//     while (id2 != -1)
+//     {
+//         molecule m2 = *mol_list[id2];
+//         e += lj_energy(m1,*mol_list[id2]);
+// //cout << "2 icell "<<icell << " jcell "<< jcell << " e = "<< e << " id " << id1 << " "<< id2  << " D "<< Distance(m1,m2)<< endl;
+
+//         id2 = dd.linked_list[id2];
+
+//     }
+
+
+//     jcell = icell; //neighboring cell
+//     id2 = dd.hoc[jcell]; //take the hoc of cell
+
+//     while (id2 != -1)
+//     {
+//         if(id1!=id2)
+//         {
+//             e += lj_energy(m1,*mol_list[id2]);
+// //cout << "3 icell "<<icell << " jcell "<< jcell << " e = "<< e << " id " << id1 << " "<< id2  << " D "<< Distance(m1,*mol_list[id2])<< endl;
+//         }
+//         id2 = dd.linked_list[id2];
+
+//     }
+
+
+
+
+
+    double e        = 0.0;
+    molecule m1     = stars[star_i].poly[pol_i].M[mol_i];
+    int id1         = stars[star_i].poly[pol_i].M[mol_i].id;
+    int icell       = int(floor(m1.z /dd.cell_size)) % dd.n;
+    if (icell < 0) icell += dd.n;
+
+    // calculate non-bonded part
+    create1D_linked_list();
+    //run through neigbouring cells
+    int jcell = (icell-1) % dd.n; //neighboring cell
+    if (jcell < 0) jcell += dd.n;
+    int id2 = dd.hoc[jcell]; //take the hoc of cell
+
+    while (id2 != -1)
+    {
+        molecule m2 = *mol_list[id2];
+        e += lj_energy(m1,m2);
+//cout << "1 icell "<<icell << " jcell "<< jcell << " e = "<< e << " id " << id1 << " "<< id2  << " D "<< Distance(m1,m2)<< endl;
+        id2 = dd.linked_list[id2];
+    }
+
+
+    jcell = (icell+1) % dd.n; //neighboring cell
+    if (jcell < 0) jcell += dd.n;
+    id2 = dd.hoc[jcell]; //take the hoc of cell
+    while (id2 != -1)
+    {
+        // molecule m2 = *mol_list[id2];
+        e += lj_energy(m1,*mol_list[id2]);
+        id2 = dd.linked_list[id2];
+
+    }
+
+
+    jcell = icell; //neighboring cell
+    id2 = dd.hoc[jcell]; //take the hoc of cell
+
+    while (id2 != -1)
+    {
+        if(id1!=id2)
+        {
+            e += lj_energy(m1,*mol_list[id2]);
+//cout << "3 icell "<<icell << " jcell "<< jcell << " e = "<< e << " id " << id1 << " "<< id2  << " D "<< Distance(m1,*mol_list[id2])<< endl;
+        }
+        id2 = dd.linked_list[id2];
+
+    }
+
+    return e;
+}
 
 
 
@@ -309,6 +560,7 @@ int sim_system::create_particle_list()
     {
         max_part_id ++;
         //mol_list[i] = new molecule;
+        M[i].id  = max_part_id;
         mol_list[i] = &M[i];
 
     }
@@ -324,7 +576,30 @@ int sim_system::create_particle_list()
             cout << "mol_list = " << max_part_id << endl;
             //mol_list[max_part_id] = new molecule;
 //            molecule m_tmp = poly[i].M[j];
+            poly[i].M[j].id = max_part_id;
             mol_list[max_part_id] = &(poly[i].M[j]);
+
+        }
+
+    }
+
+    cout << " ## Creating stars list ... " << endl;
+
+   for (int i = 0; i < N_stars; i++)
+    {
+        cout << " \t star number  #" << i << " with " << stars[i].N_arms << " polymers"<< endl;
+        for (int j = 0; j < stars[i].N_arms; ++j)
+        {
+
+            for (int k = 0; k <  stars[i].poly[j].N; ++k)
+            {
+                max_part_id ++;
+                cout << "mol_list = " << max_part_id << endl;
+                //mol_list[max_part_id] = new molecule;
+    //            molecule m_tmp = poly[i].M[j];
+                stars[i].poly[j].M[k].id = max_part_id;
+                mol_list[max_part_id] = &(stars[i].poly[j].M[k]);
+            }
 
         }
 
@@ -369,14 +644,37 @@ double sim_system::extra_energy_pol()
     // an example of constraint
     //springs on polymers' centers of masses.
 //    poly[0].update_COM();
-    e += 50.0*((poly[0].xc-L/2.)*(poly[0].xc-L/2.)+(poly[0].yc-L/2.)*(poly[0].yc-L/2.)+(poly[0].zc-L/2.)*(poly[0].zc-L/2.));
+    // e += 50.0*((poly[0].xc-L/2.)*(poly[0].xc-L/2.)+(poly[0].yc-L/2.)*(poly[0].yc-L/2.)+(poly[0].zc-L/2.)*(poly[0].zc-L/2.));
+    e += 100.0*((stars[0].xc-L/2.)*(stars[0].xc-L/2.)+(stars[0].yc-L/2.)*(stars[0].yc-L/2.)+(stars[0].zc-L/2.)*(stars[0].zc-L/2.));
+    // e += 50.0*((stars[1].xc-L/2.)*(stars[1].xc-L/2.)+(stars[1].yc-L/2.)*(stars[1].yc-L/2.)+(stars[1].zc-L/2.-disntance_between_COM)*(stars[1].zc-L/2.-disntance_between_COM));
+
+    // M[0].move_to_position(L/2.-5,L/2.,L/2.);
+    // double rr = Distance(M[0],stars[0].poly[0].M[0]);
+    // e += 50.*rr*rr;
+
+    // M[0].move_to_position(L/2.+5,L/2.,L/2.);
+    // rr = Distance(M[0],stars[0].poly[0].M[stars[0].poly[0].N-1]);
+    // e += 50.*rr*rr;
+
+    // M[0].move_to_position(L/2.,L/2.-5,L/2.);
+    // rr = Distance(M[0],stars[0].poly[1].M[0]);
+    // e += 50.*rr*rr;
+
+    // M[0].move_to_position(L/2.,L/2.+5,L/2.);
+    // rr = Distance(M[0],stars[0].poly[1].M[stars[0].poly[1].N-1]);
+    // e += 50.*rr*rr;
+
+
 //    poly[1].update_COM();
-   e += 50.0*((poly[1].xc-L/2.)*(poly[1].xc-L/2.)+(poly[1].yc-L/2.)*(poly[1].yc-L/2.)+(poly[1].zc-disntance_between_COM-L/2.)*(poly[1].zc-disntance_between_COM -L/2.));
-//double rc = sqrt((poly[1].xc)*(poly[1].xc)+(poly[1].yc)*(poly[1].yc)+(poly[1].zc)*(poly[1].zc));
-//    e += -2.*exp(-rc*rc/0.7/0.7/2.);
-//    e += exp(500.*(rc-n_end));
-//    e += exp(500.*(n0-rc));
-//    e += log(4*M_PI*rc*rc);
+    // e += 50.0*((poly[1].xc-L/2.)*(poly[1].xc-L/2.)+(poly[1].yc-L/2.)*(poly[1].yc-L/2.)+(poly[1].zc-L/2.)*(poly[1].zc-L/2.));
+    
+    double rc = sqrt((stars[1].xc-stars[0].xc)*(stars[1].xc-stars[0].xc)+(stars[1].yc-stars[0].yc)*(stars[1].yc-stars[0].yc)+(stars[1].zc-stars[0].zc)*(stars[1].zc-stars[0].zc));
+    e += -1.*A_gauss*exp(-rc*rc/0.5/0.5/2.);
+    e += exp(500.*(rc-n_end));
+    // e += exp(500.*(n0-rc));
+    // e += 2.0*log(rc+1);
+    e += log(4*M_PI*rc*rc);
+
 //    poly[2].update_COM();
 //    e += 100.0*(poly[2].xc-7.)*(poly[2].xc-7.)+(poly[2].yc)*(poly[2].yc)+(poly[2].zc)*(poly[2].zc);
 //    poly[3].update_COM();
@@ -440,11 +738,18 @@ double sim_system::calc_total_energy()
 
     //e += constraint_energy(*mol_list[max_part_id-1]);
     // bobnded part of energy
-    for (int i = 0; i < N_polymers; i++)
+//     for (int i = 0; i < N_polymers; i++)
+//     {
+//         e += poly[i].bond_energy();
+// //        cout << "bonded = " << poly[i].bond_energy()<<endl;
+//         poly[i].update_COM();
+//     }
+
+    for (int i = 0; i < N_stars; i++)
     {
-        e += poly[i].bond_energy();
+        e += stars[i].bond_energy();
 //        cout << "bonded = " << poly[i].bond_energy()<<endl;
-        poly[i].update_COM();
+        stars[i].update_COM();
     }
 
     e += sim_system::extra_energy_pol();
@@ -452,6 +757,27 @@ double sim_system::calc_total_energy()
     return e;
 }
 
+
+double sim_system::calc_total_nonbonded()
+{
+    double e = 0.0;
+    // nonbonded part
+    for(int i=0;i<max_part_id;i++){
+        molecule m1=*mol_list[i];
+        //e+=constraint_energy(m1);
+
+        for (int j = i+1; j < max_part_id+1; j++){
+            molecule m2 = *mol_list[j];
+            //coulomb interaction
+            //e += electrostatic_energy(m1,m2);
+            //Lennard-jones
+            e += lj_energy(m1,m2);
+
+        }
+    }
+
+    return e;
+}
 
 int sim_system::mc_step_mol( int mol_ind){
 //    double eold=calc_energy(M,size);
@@ -516,7 +842,7 @@ int sim_system::move_COM_pol( int pol_ind){
     double dy   = step*sin(theta)*sin(phi);
     double dz   = step*cos(theta);
 
-    poly[pol_ind].displace_polymer(dx,dy,dz);
+    poly[pol_ind].displace(dx,dy,dz);
 
     double enew = calc_total_energy();
 
@@ -525,7 +851,36 @@ int sim_system::move_COM_pol( int pol_ind){
     if(drand48() < prob){
         return 1;}
     else {
-        poly[pol_ind].displace_polymer(-dx,-dy,-dz);
+        poly[pol_ind].displace(-dx,-dy,-dz);
+
+//        cout << "probability " << drand48() << " and "<< exp(-enew+eold) << "; E new = "<< enew << " ; E old = "<< eold << endl;
+        return 0;    }
+
+}
+
+int sim_system::move_COM_star( int star_i){
+//    double eold=calc_energy(M,size);
+    double eold = recalc_nonbonded_ll();
+    eold       += extra_energy_pol();
+
+    double theta=acos(2*(drand48()-0.5));
+    double phi=2.0*M_PI*drand48();
+    double step = 0.5*drand48();
+    double dx   = step*sin(theta)*cos(phi);
+    double dy   = step*sin(theta)*sin(phi);
+    double dz   = step*cos(theta);
+
+    stars[star_i].displace(dx,dy,dz);
+
+    double enew = recalc_nonbonded_ll();
+    enew       += extra_energy_pol();
+
+
+    double prob = exp((-enew+eold)/kT);
+    if(drand48() < prob){
+        return 1;}
+    else {
+        stars[star_i].displace(-dx,-dy,-dz);
 
 //        cout << "probability " << drand48() << " and "<< exp(-enew+eold) << "; E new = "<< enew << " ; E old = "<< eold << endl;
         return 0;    }
@@ -568,7 +923,7 @@ int sim_system::move_pivot_pol( int pol_ind){
     double Dxc=xc-poly[pol_ind].xc;
     double Dyc=yc-poly[pol_ind].yc;
     double Dzc=zc-poly[pol_ind].zc;
-    poly[pol_ind].displace_polymer(Dxc,Dyc,Dzc); // put the polymer into the old COM
+    poly[pol_ind].displace(Dxc,Dyc,Dzc); // put the polymer into the old COM
 
 //    for (int i = mol_ind+1 ; i<poly[pol_ind].N; i++)
 //    {
@@ -585,7 +940,7 @@ int sim_system::move_pivot_pol( int pol_ind){
         return 1;}
     else {
 
-        poly[pol_ind].displace_polymer(-Dxc,-Dyc,-Dzc);
+        poly[pol_ind].displace(-Dxc,-Dyc,-Dzc);
 
         for (int i = mol_ind+1 ; i<poly[pol_ind].N; i++)
         {
@@ -601,6 +956,43 @@ int sim_system::move_pivot_pol( int pol_ind){
         return 0;    }
 
 }
+
+
+int sim_system::move_pivot_star( int star_i){
+//    double eold=calc_energy(M,size);
+    int pol_ind     = (int)(drand48()*(double)(stars[star_i].N_arms));
+    int mol_ind     = 1 + (int)(drand48()*(double)(stars[star_i].poly[pol_ind].N-1));
+    double eold     = 0.0;
+
+    eold += recalc_nonbonded_ll();
+
+    // double eold_tot = calc_total_nonbonded();
+    // ***** generate random rotation parameters
+    double theta    = acos(2*(drand48()-0.5));
+    double phi      = 2.0*M_PI*drand48();
+    double angle    = 2.0*M_PI*drand48();
+
+    stars[star_i].poly[pol_ind].pivot_turn(mol_ind,phi,theta,angle);
+    stars[star_i].set_COM(stars[star_i].xc,stars[star_i].yc,stars[star_i].zc);
+
+
+    double enew     = 0.0;
+
+    enew +=recalc_nonbonded_ll();
+    // double enew_tot = calc_total_nonbonded();
+    
+
+    double prob = exp((-enew+eold)/kT);
+    if(drand48() < prob){
+        return 1;}
+    else {
+        stars[star_i].poly[pol_ind].pivot_turn(mol_ind,phi,theta,-angle);
+        stars[star_i].set_COM(stars[star_i].xc,stars[star_i].yc,stars[star_i].zc);
+        return 0;
+         }
+
+}
+
 
 //Switch linked cell list here
 int sim_system::mc_step_pol( int pol_ind){
@@ -646,6 +1038,83 @@ int sim_system::mc_step_pol( int pol_ind){
 
 }
 
+
+int sim_system::mc_step_star( int star_i){
+//    double eold=calc_energy(M,size);
+    int pol_ind = (int)(drand48()*(double)(stars[star_i].N_arms));
+    int mol_ind = (int)(drand48()*(double)(stars[star_i].poly[pol_ind].N));
+    double eold = recalc_energy_star_ll(star_i,pol_ind,mol_ind); //change into recalc_energy_pol() to use without linked lists
+//    cout << " ll E = "<<eold <<endl;
+//    eold = recalc_energy_pol(pol_ind,mol_ind); //change into recalc_energy_pol() to use without linked lists
+//    cout << " " << eold <<endl;
+   // eold       +=  sim_system::extra_energy_pol();
+
+    double x1   = stars[star_i].poly[pol_ind].M[mol_ind].x;
+    double y1   = stars[star_i].poly[pol_ind].M[mol_ind].y;
+    double z1   = stars[star_i].poly[pol_ind].M[mol_ind].z;
+
+    stars[star_i].poly[pol_ind].M[mol_ind].advance(1);
+
+    double Dxc  = (stars[star_i].poly[pol_ind].M[mol_ind].x-x1)/stars[star_i].poly[pol_ind].N/stars[star_i].N_arms;
+    double Dyc  = (stars[star_i].poly[pol_ind].M[mol_ind].y-y1)/stars[star_i].poly[pol_ind].N/stars[star_i].N_arms;
+    double Dzc  = (stars[star_i].poly[pol_ind].M[mol_ind].z-z1)/stars[star_i].poly[pol_ind].N/stars[star_i].N_arms;
+
+    stars[star_i].xc += Dxc;
+    stars[star_i].yc += Dyc;
+    stars[star_i].zc += Dzc;
+
+    stars[star_i].poly[pol_ind].xc += Dxc*stars[star_i].N_arms;
+    stars[star_i].poly[pol_ind].yc += Dyc*stars[star_i].N_arms;
+    stars[star_i].poly[pol_ind].zc += Dzc*stars[star_i].N_arms;
+
+
+    double enew = recalc_energy_star_ll(star_i,pol_ind, mol_ind);
+   // enew       +=  sim_system::extra_energy_pol();
+
+
+    double prob = exp((-enew+eold)/kT);
+    if(drand48() < prob){
+        //cout << enew-eold<<endl;
+        return 1;
+        }
+    else {
+        stars[star_i].poly[pol_ind].M[mol_ind].move_to_position(x1,y1,z1);
+
+        stars[star_i].xc -= Dxc;
+        stars[star_i].yc -= Dyc;
+        stars[star_i].zc -= Dzc;
+
+        stars[star_i].poly[pol_ind].xc -= Dxc*stars[star_i].N_arms;
+        stars[star_i].poly[pol_ind].yc -= Dyc*stars[star_i].N_arms;
+        stars[star_i].poly[pol_ind].zc -= Dzc*stars[star_i].N_arms;
+//        cout << "probability " << drand48() << " and "<< exp(-enew+eold) << "; E new = "<< enew << " ; E old = "<< eold << endl;
+        return 0;    }
+
+}
+
+double sim_system::mc_steps_star(int Nsteps){
+
+    int success1 = 0;
+    int success2 = 0;
+    int success3 = 0;
+
+    double p_pivot = 0.004;
+    double p_COM   = 0.005;
+
+    for (int i = 0; i < Nsteps; i++)
+        {
+            int index = (int)(drand48()*(double)(N_stars));
+            if (drand48()<1-p_pivot - p_COM)
+                    { success1 += mc_step_star(index);}
+            else if (drand48() < 1 - p_COM)   { success2 += move_pivot_star(index); }
+            else    {success3 += move_COM_star(1);}
+        }
+
+    // cout << " local move p = " << (double)success1/Nsteps/(1.-p_pivot) << " pivot move p = " << (double)success2/p_pivot/Nsteps <<  endl;
+
+    return (double)(success1+success2+success3)/Nsteps;
+
+}
 
 double sim_system::mc_steps_pol( int Nsteps){
     int success1=0;
@@ -721,22 +1190,22 @@ int sim_system::gnuplot(int j /*, char * file_format*/){
 	    int cnt = 1;
 	    fprintf(positions_file2,"REMARK polymer configuration in MC code\n");
 
-	    for(int i=0; i < 20;i++)
-	    {
-            for(int kk=0; kk < 30;kk++)
-                {
-            //double theta=acos(2*(drand48()-0.5));
-            double theta=acos(-1.0+i*2.0/20.);
-            //double phi=M_PI*drand48();
-            double phi=2.0*M_PI*kk*1.0/20.;
-            double x =L/2.+ 0.5*R*sin(theta)*cos(phi);
-            double y =L/2.+ 0.5*R*sin(theta)*sin(phi);
-            double z =L/2.+ 0.5*R*cos(theta);
-                //positions_file2 << poly[i].M[j].x << "  " << poly[i].M[j].y << "  " << poly[i].M[j].z << "  " << poly[i].id  << endl;
-            fprintf(positions_file2,"ATOM %6d%4s  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d \n",cnt, "FE",cnt-1,x,y,z , 10 );
-            cnt++;
+	    // for(int i=0; i < 20;i++)
+	    // {
+     //        for(int kk=0; kk < 30;kk++)
+     //            {
+     //        //double theta=acos(2*(drand48()-0.5));
+     //        double theta=acos(-1.0+i*2.0/20.);
+     //        //double phi=M_PI*drand48();
+     //        double phi=2.0*M_PI*kk*1.0/20.;
+     //        double x =L/2.+ 0.5*R*sin(theta)*cos(phi);
+     //        double y =L/2.+ 0.5*R*sin(theta)*sin(phi);
+     //        double z =L/2.+ 0.5*R*cos(theta);
+     //            //positions_file2 << poly[i].M[j].x << "  " << poly[i].M[j].y << "  " << poly[i].M[j].z << "  " << poly[i].id  << endl;
+     //        fprintf(positions_file2,"ATOM %6d%4s  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d \n",cnt, "FE",cnt-1,x,y,z , 10 );
+     //        cnt++;
 
-	    }}
+	    // }}
 
 //	    	    for(int i=0; i < N_molecules;i++)
 //	    {
@@ -746,15 +1215,29 @@ int sim_system::gnuplot(int j /*, char * file_format*/){
 //
 //	    }
 
-	    for(int i=0; i < N_polymers; i++)
-	    {
-            for(int j=0;j<poly[i].N;j++)
+	    // for(int i=0; i < N_polymers; i++)
+	    // {
+     //        for(int j=0;j<poly[i].N;j++)
+     //        {
+     //            //positions_file2 << poly[i].M[j].x << "  " << poly[i].M[j].y << "  " << poly[i].M[j].z << "  " << poly[i].id  << endl;
+     //            fprintf(positions_file2,"ATOM %6d%4s  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d \n",cnt, "FE",cnt-1,poly[i].M[j].x,poly[i].M[j].y,poly[i].M[j].z ,  1+poly[i].id);
+     //            cnt++;
+     //        }
+	    // }
+
+         for(int i=0; i < N_stars; i++)
+        {
+            for(int j=0;j<stars[i].N_arms;j++)
             {
-                //positions_file2 << poly[i].M[j].x << "  " << poly[i].M[j].y << "  " << poly[i].M[j].z << "  " << poly[i].id  << endl;
-                fprintf(positions_file2,"ATOM %6d%4s  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d \n",cnt, "FE",cnt-1,poly[i].M[j].x,poly[i].M[j].y,poly[i].M[j].z ,  1+poly[i].id);
-                cnt++;
+                for(int k=0;k<stars[i].poly[j].N;k++)
+                {
+                    //positions_file2 << poly[i].M[j].x << "  " << poly[i].M[j].y << "  " << poly[i].M[j].z << "  " << poly[i].id  << endl;
+                    fprintf(positions_file2,"ATOM %6d%4s  UNX F%4d    %8.3f%8.3f%8.3f  0.00  0.00      T%03d \n",cnt, "FE",cnt-1,stars[i].poly[j].M[k].x,stars[i].poly[j].M[k].y,stars[i].poly[j].M[k].z,  1+stars[i].poly[j].id);
+                    cnt++;
+                }
+
             }
-	    }
+        }
 	    //positions_file2.close();
 	    fclose(positions_file2);
 //	    char * commandsForGnuplot[] = {"set title 'Graph'; set pointsize 0.5;set view equal xyz", " "};

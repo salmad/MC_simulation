@@ -39,14 +39,23 @@ extern const double lj_shift_cations;
 
 extern int N_molecules;
 extern int N_polymers;
+extern int N_stars;
 extern int mol_id;
 extern int pol_id;
+extern int star_id;
 extern const double kT;
 extern const double lambda;
 extern double k;
 extern double disntance_between_COM;
 extern double n0;
 extern double n_end;
+
+extern int N_arms1;
+extern int N_arms2;
+// extern int N_monomers1[N_arms1];
+// extern int N_monomers2[N_arms2];
+extern int N_monomers;
+extern double A_gauss;
 
 
 #endif // GLOBAL_H_INCLUDED

@@ -309,24 +309,34 @@ void plot_radius(int  counts[], int j){
     sprintf(str,"/radius_prob%d.dat",j);
 //    printf(str);
 	radius_file.open( (foldername+str).c_str() , ofstream::out | ofstream::trunc);
-	double dr = R/nbins;
+	double dr = abs(n_end-n0)/nbins;
 	for(int i=0;i<nbins;i++){
-	   	radius_file << (double)counts[i]/4.0/M_PI/((1.0+i)*dr)/((1.0+i)*dr)/(dr)/(j+1) << "  " << (double)(1.0+i)*dr  << endl;
+		double rc = (double)(1.0+i)*dr;
+		double prob = (double)counts[i]/4.0/M_PI/rc/rc/(dr)/(j+1);
+		double e = 0;
+		e = -log(prob);
+		e += A_gauss*exp(-rc*rc/0.5/0.5/2.);
+    	e += -exp(500.*(rc-n_end));
+    	e += -log(4*M_PI*rc*rc);
+    	// cout <<  rc << "  " << prob << "  " << e << " " << counts[i] << endl;
+	   	radius_file << rc << "  " << prob << "  " << e << " " << counts[i] << endl;
 	    }
     radius_file.close();
 
 	//	    char * commandsForGnuplot[] = {"set title 'Graph'; set pointsize 0.5;set view equal xyz", " "};
 
 
+
+
 		    FILE * gnuplotPipe = popen ("gnuplot -persistent", "w");
 
 		fprintf(gnuplotPipe, "set terminal postscript eps enhanced color font 'Helvetica,20'\n");
-		fprintf(gnuplotPipe, "set output 'radial%d.eps'\n",j );
+		fprintf(gnuplotPipe, "set output './%s/radial%d.eps'\n",(foldername).c_str(),j );
 		fprintf(gnuplotPipe, "set xlabel 'X '\n" );
 		fprintf(gnuplotPipe, "set ylabel 'Y '\n" );
 		fprintf(gnuplotPipe, "set ticslevel 0 \n" );
 		fprintf(gnuplotPipe, "set title 'Radial Distribution'; set pointsize 0.70; \n");
-		fprintf(gnuplotPipe, "plot '%s' u 2:1 w l lt 1 lc -1,'%s' u 2:1 w p pt 7 lc 1  \n",(foldername+str).c_str(),(foldername+str).c_str() );
+		fprintf(gnuplotPipe, "plot '%s' u 1:3 w l lt 1 lc -1 t '','%s' u 1:3:(3./($4-1.)) w errorbars pt 7 lc 1 t ''  \n",(foldername+str).c_str(),(foldername+str).c_str() );
 		pclose(gnuplotPipe);
 
 }
@@ -469,9 +479,9 @@ void return_molecules(molecule M[]){
     		if((M[i].x >L)||(M[i].y >L)||(M[i].z >L)||(M[i].x <-0.01)||(M[i].y <-0.01)||(M[i].z <-0.01)){
     			cout << "\t\t Cubic geometry! Particle fixed! xyz old = " <<  M[i].x<< " ;"<< M[i].y << " ;" << M[i].z   << endl;
     			j++;
-    	    	double x1=drand48()*(L);
-    	    	double y1=drand48()*(L);
-    	    	double z1=drand48()*(L);
+    	    	double x1 = fmod(M[i].x+10*L,L);
+    	    	double y1 = fmod(M[i].y+10*L,L);
+    	    	double z1 = fmod(M[i].z+10*L,L);
     			M[i].move_to_position(x1,y1,z1);
     			cout << "\t\t Cubic geometry! Particle fixed! xyz new = " <<  M[i].x<< " ;"<< M[i].y << " ;" << M[i].z   << endl;
     		}

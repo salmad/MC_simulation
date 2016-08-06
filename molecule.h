@@ -24,6 +24,7 @@ class molecule{
 //}
         double move_to_position(molecule m);
         double advance(int );
+        void   displace(double dx,double dy,double dz);
         double move_to_position(double , double , double );
         double advance(int n, double step);
 

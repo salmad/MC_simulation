@@ -84,9 +84,9 @@ double molecule::advance(int n, double step){
     y += dy;
     z += dz;
 //    periodic boundary condtions
-//    if (x>L){x-=L;} else if (x<0.0){x+=L;}
-//    if (y>L){y-=L;} else if (y<0.0){y+=L;}
-//    if (z>L){z-=L;} else if (z<0.0){z+=L;}
+   if (x>L){x-=L;} else if (x<0.0){x+=L;}
+   if (y>L){y-=L;} else if (y<0.0){y+=L;}
+   if (z>L){z-=L;} else if (z<0.0){z+=L;}
     dr=sqrt(dx*dx+dy*dy+dz*dz);
     r+=dr;
     }
@@ -104,6 +104,16 @@ double molecule::move_to_position(double x1, double y1, double z1){
 //    if (z>L){z-=L;} else if (z<0.0){z+=L;}
     radius = sqrt(x*x+y*y+z*z);
     return radius;
+}
+
+void molecule::displace(double dx, double dy, double dz){
+    x+=dx;
+    y+=dy;
+    z+=dz;
+//    if (x>L){x-=L;} else if (x<0.0){x+=L;}
+//    if (y>L){y-=L;} else if (y<0.0){y+=L;}
+//    if (z>L){z-=L;} else if (z<0.0){z+=L;}
+    radius = sqrt(x*x+y*y+z*z);
 }
 
 double molecule::move_to_position(molecule m){
