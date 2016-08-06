@@ -646,7 +646,7 @@ double sim_system::extra_energy_pol()
 //    poly[0].update_COM();
     // e += 50.0*((poly[0].xc-L/2.)*(poly[0].xc-L/2.)+(poly[0].yc-L/2.)*(poly[0].yc-L/2.)+(poly[0].zc-L/2.)*(poly[0].zc-L/2.));
     e += 100.0*((stars[0].xc-L/2.)*(stars[0].xc-L/2.)+(stars[0].yc-L/2.)*(stars[0].yc-L/2.)+(stars[0].zc-L/2.)*(stars[0].zc-L/2.));
-    // e += 50.0*((stars[1].xc-L/2.)*(stars[1].xc-L/2.)+(stars[1].yc-L/2.)*(stars[1].yc-L/2.)+(stars[1].zc-L/2.-disntance_between_COM)*(stars[1].zc-L/2.-disntance_between_COM));
+    e += 100.0*((stars[1].xc-L/2.)*(stars[1].xc-L/2.)+(stars[1].yc-L/2.)*(stars[1].yc-L/2.)+(stars[1].zc-L/2.-disntance_between_COM)*(stars[1].zc-L/2.-disntance_between_COM));
 
     // M[0].move_to_position(L/2.-5,L/2.,L/2.);
     // double rr = Distance(M[0],stars[0].poly[0].M[0]);
@@ -667,19 +667,19 @@ double sim_system::extra_energy_pol()
 
 //    poly[1].update_COM();
     // e += 50.0*((poly[1].xc-L/2.)*(poly[1].xc-L/2.)+(poly[1].yc-L/2.)*(poly[1].yc-L/2.)+(poly[1].zc-L/2.)*(poly[1].zc-L/2.));
-    
-    double rc = sqrt((stars[1].xc-stars[0].xc)*(stars[1].xc-stars[0].xc)+(stars[1].yc-stars[0].yc)*(stars[1].yc-stars[0].yc)+(stars[1].zc-stars[0].zc)*(stars[1].zc-stars[0].zc));
-    e += -1.*A_gauss*exp(-rc*rc/0.5/0.5/2.);
-    e += exp(500.*(rc-n_end));
-    // e += exp(500.*(n0-rc));
-    // e += 2.0*log(rc+1);
-    e += log(4*M_PI*rc*rc);
 
-//    poly[2].update_COM();
-//    e += 100.0*(poly[2].xc-7.)*(poly[2].xc-7.)+(poly[2].yc)*(poly[2].yc)+(poly[2].zc)*(poly[2].zc);
-//    poly[3].update_COM();
-//    e += 100.0*(poly[3].xc+7.)*(poly[3].xc+7.)+(poly[3].yc)*(poly[3].yc)+(poly[3].zc)*(poly[3].zc);
-//    cout << "error here? " << e << endl;
+// #########################################
+////////  measure histogram of two stars
+
+    // double rc = sqrt((stars[1].xc-stars[0].xc)*(stars[1].xc-stars[0].xc)+(stars[1].yc-stars[0].yc)*(stars[1].yc-stars[0].yc)+(stars[1].zc-stars[0].zc)*(stars[1].zc-stars[0].zc));
+    // e += -1.*A_gauss*exp(-rc*rc/0.5/0.5/2.);
+    // e += exp(500.*(rc-n_end));
+    // e += log(4*M_PI*rc*rc);
+// ################################
+
+    // e += exp(500.*(n0-rc));
+
+
     return e;
 }
 
@@ -980,7 +980,7 @@ int sim_system::move_pivot_star( int star_i){
 
     enew +=recalc_nonbonded_ll();
     // double enew_tot = calc_total_nonbonded();
-    
+
 
     double prob = exp((-enew+eold)/kT);
     if(drand48() < prob){

@@ -51,15 +51,15 @@ const double lj_shift_cations=0.25;
 const double kT=1.0;
 const double lambda=10.0;
 double k=200.0;
-double disntance_between_COM = 0.50;
+double disntance_between_COM = 3.50;
 double n0=0.0;
 double n_end=2.5;
 
 
-int N_arms1 = 4;
-int N_arms2 = 4;
-int N_monomers1[  ] = {25,25,25,25};
-int N_monomers2[  ] = {25,25,25,25};
+int N_arms1 = 2;
+int N_arms2 = 2;
+int N_monomers1[  ] = {17,17};
+int N_monomers2[  ] = {17,17};
 int N_monomers = 10;
 double A_gauss = 0.65*pow(1.0*N_arms1*N_arms2,0.7);
 
@@ -206,7 +206,7 @@ int main(int argc, char* argv[]) {
 
 
 ////////////////////////////////////////////////////////////
-   int nsteps = 30000; int ntimes=40000;
+   int nsteps = 10000; int ntimes=40000;
 
 
    // Equilibrate configuration
@@ -217,7 +217,8 @@ int main(int argc, char* argv[]) {
 			cout << "\ntotal energy " <<sys.calc_total_energy();}
 	int hist_p[nbins]={};
 	int hist[nbins] = {};
-
+    double Rg = 0.0; double Rg_err = 0.;
+    double Rg_p = 0.0; double Rg_err_p = 0.;
     double pos1 = 0.,pos2 = 0., pos_av=0.0;double pols_energy=0.;
     double r1 = 0.,r2 = 0.;
 
@@ -232,7 +233,13 @@ int main(int argc, char* argv[]) {
        pos2     = sqrt((stars[1].xc-stars[0].xc)*(stars[1].xc-stars[0].xc)+(stars[1].yc-stars[0].yc)*(stars[1].yc-stars[0].yc)+(stars[1].zc-stars[0].zc)*(stars[1].zc-stars[0].zc));
        hist_p[int(pos2/abs(n_end-n0)*nbins)]++;
        pols_energy += sys.calc_total_energy();
+       Rg_p         += 0.5*(stars[1].gyration_radius()+stars[0].gyration_radius());
+       Rg_err_p       = 0.5*(stars[1].gyration_radius()-stars[0].gyration_radius());
 
+        MPI_Allreduce(&Rg_p, &Rg, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+        MPI_Allreduce(&Rg_err_p, &Rg_err, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
+
+        cout << "\t\t " << "; Rg = " << Rg/(j+1)/np << "; error +-   " << Rg_err/np  << endl;
 
 		if (j%(ntimes/100)==0){
 			for(int ps = 0; ps < np; ps++) {
@@ -249,13 +256,15 @@ int main(int argc, char* argv[]) {
 
 
 			MPI_Allreduce(&hist_p, &hist, nbins, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
+
 			plot_radius(hist,j+np);
 			// sys.gnuplot(j+np);
 		}
 
     }
 
-   	cout << "\t\t Finish #" << "; Etot = " << pols_energy/ntimes << "; Accept. = " << acceptance  << endl;
+
+    cout << "\t\t Finish #" << "; Etot = " << pols_energy/ntimes << "; Accept. = " << acceptance  << endl;
    	plot_radius(hist,ntimes+1);
 
     return_molecules(M);

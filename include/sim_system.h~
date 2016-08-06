@@ -39,7 +39,7 @@ class sim_system
         dom_decomposition dd;
         void create1D_linked_list();
         void create3D_linked_list();
-            const int neighbor_cell[39] = {
+        const int neighbor_cell[39] = {
     1, 0, 0,
     0, 1, 0,
     0, 0, 1,
@@ -76,7 +76,7 @@ class sim_system
         double calc_total_nonbonded();
 	double recalc_nonbonded_ll();
         int move_pivot_pol( int );                          //attempt of a povit move
-
+	double gyration_radius() ;
         int mc_step_mol( int );
         double mc_steps_mol( int );
 

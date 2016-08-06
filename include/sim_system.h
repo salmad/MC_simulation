@@ -39,7 +39,7 @@ class sim_system
         dom_decomposition dd;
         void create1D_linked_list();
         void create3D_linked_list();
-            const int neighbor_cell[39] = {
+        const int neighbor_cell[39] = {
     1, 0, 0,
     0, 1, 0,
     0, 0, 1,

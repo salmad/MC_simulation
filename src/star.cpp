@@ -61,12 +61,12 @@ star::star(int N, double x, double y, double z)
 void star::set_arms(int N, int *N_pol, double x, double y, double z)
 {
     N_arms = N;
- 
+
 
     for (int i = 0; i < N_arms; i++)
     {
         poly[i].set_N(N_pol[i]);
-        cout << "from star printing arm monomers :  Npol = " << N_pol[i] << endl;  
+        cout << "from star printing arm monomers :  Npol = " << N_pol[i] << endl;
     }
 
     star_id++;
@@ -125,7 +125,7 @@ void star::set_COM( double x ,double y ,double z ){
 //     }
 
 //     /*the center of the star is the first polymer*/
-//     molecule mc 			= poly[0].M[(poly[0].N+1)/2] ; 
+//     molecule mc 			= poly[0].M[(poly[0].N+1)/2] ;
 //     double k 				= poly[0].k;
 //     double delta 			= poly[0].delta;
 
@@ -148,7 +148,7 @@ double star::bond_energy()
     }
 
     /*the center of the star is the first polymer*/
-    molecule mc 			= poly[0].M[0] ; 
+    molecule mc 			= poly[0].M[0] ;
     double k 				= poly[0].k;
     double delta 			= poly[0].delta;
 
@@ -163,6 +163,24 @@ double star::bond_energy()
 }
 
 
+double star::gyration_radius()
+{
+    double rad    = 0.0;
+    int    count  = 0;
+    for (int i = 0; i< N_arms;i++){
+        for (int j = 0; j< poly[i].N ; j++){
+            double x = poly[i].M[j].x;
+            double y = poly[i].M[j].y;
+            double z = poly[i].M[j].z;
+            rad += (x-xc)*(x-xc)+(y-yc)*(y-yc)+(z-zc)*(z-zc);
+            count++;
+        }
+    }
+
+    return (double)rad/count;
+}
+
+
 //connected to the center of the polymer
 // double star::bond_energy(int i /*polymer index*/,int j /* monomer index*/)
 // {
@@ -170,7 +188,7 @@ double star::bond_energy()
 //     en 		 += poly[i].bond_energy(j);
 
 //         /*the center of the star is the first polymer*/
-//     molecule mc 			= poly[0].M[(poly[0].N+1)/2] ; 
+//     molecule mc 			= poly[0].M[(poly[0].N+1)/2] ;
 //     double k 				= poly[0].k;
 //     double delta 			= poly[0].delta;
 
@@ -199,18 +217,18 @@ double star::bond_energy(int i /*polymer index*/,int j /* monomer index*/)
     if (j==0 && i>0 )
     {
                 /*the center of the star is the first polymer*/
-        molecule mc             = poly[0].M[0] ; 
+        molecule mc             = poly[0].M[0] ;
         double k                = poly[0].k;
         double delta            = poly[0].delta;
 
         molecule m_center   = poly[i].M[0];  /* The central molecule to each polymer*/
         double d            = Distance(mc,m_center);
         en                 += k*(d-delta)*(d-delta)*0.5;
-    } 
+    }
 
     if (i==0 && j==0)
     {
-        molecule mc              = poly[0].M[0] ; 
+        molecule mc              = poly[0].M[0] ;
         double k                 = poly[0].k;
         double delta             = poly[0].delta;
         for (int l = 1; l< N_arms;l++){
