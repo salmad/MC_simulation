@@ -236,12 +236,11 @@ int main(int argc, char* argv[]) {
        Rg_p         += 0.5*(stars[1].gyration_radius()+stars[0].gyration_radius());
        Rg_err_p       = 0.5*(stars[1].gyration_radius()-stars[0].gyration_radius());
 
-        MPI_Allreduce(&Rg_p, &Rg, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
-        MPI_Allreduce(&Rg_err_p, &Rg_err, 1, MPI_FLOAT, MPI_SUM, MPI_COMM_WORLD);
 
-        cout << "\t\t " << "; Rg = " << Rg/(j+1)/np << "; error +-   " << Rg_err/np  << endl;
+
 
 		if (j%(ntimes/100)==0){
+
 			for(int ps = 0; ps < np; ps++) {
 		    	MPI_Barrier(MPI_COMM_WORLD);
 		    	if (ps == pid) {
@@ -254,9 +253,12 @@ int main(int argc, char* argv[]) {
 		    	}
 			}
 
+            MPI_Allreduce(&Rg_p, &Rg, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(&Rg_err_p, &Rg_err, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            cout << "\t\t " << "; Rg = " << Rg/(j+1)/np << "; error +-   " << Rg_err/np  << endl;
+
 
 			MPI_Allreduce(&hist_p, &hist, nbins, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
-
 			plot_radius(hist,j+np);
 			// sys.gnuplot(j+np);
 		}
