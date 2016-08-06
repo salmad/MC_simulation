@@ -219,6 +219,10 @@ int main(int argc, char* argv[]) {
 	int hist[nbins] = {};
     double Rg = 0.0; double Rg_err = 0.;
     double Rg_p = 0.0; double Rg_err_p = 0.;
+
+    double Delta = 0.0; double Delta_err = 0.;
+    double Delta_p = 0.0; double Delta_err_p = 0.;
+
     double pos1 = 0.,pos2 = 0., pos_av=0.0;double pols_energy=0.;
     double r1 = 0.,r2 = 0.;
 
@@ -237,6 +241,16 @@ int main(int argc, char* argv[]) {
        Rg_err_p       = 0.5*(stars[1].gyration_radius()-stars[0].gyration_radius());
 
 
+       Delta_p +=0.5*(stars[0].poly[0].M[0].x-stars[0].xc)*(stars[0].poly[0].M[0].x-stars[0].xc)+0.5*(stars[1].poly[0].M[0].x-stars[1].xc)*(stars[1].poly[0].M[0].x-stars[1].xc);
+       Delta_p +=0.5*(stars[0].poly[0].M[0].y-stars[0].yc)*(stars[0].poly[0].M[0].y-stars[0].yc)+0.5*(stars[1].poly[0].M[0].y-stars[1].yc)*(stars[1].poly[0].M[0].y-stars[1].yc);
+       Delta_p +=0.5*(stars[0].poly[0].M[0].z-stars[0].zc)*(stars[0].poly[0].M[0].z-stars[0].zc)+0.5*(stars[1].poly[0].M[0].z-stars[1].zc)*(stars[1].poly[0].M[0].z-stars[1].zc);
+
+
+       Delta_err_p  =(stars[0].poly[0].M[0].x-stars[0].xc)*(stars[0].poly[0].M[0].x-stars[0].xc)-(stars[1].poly[0].M[0].x-stars[1].xc)*(stars[1].poly[0].M[0].x-stars[1].xc);
+       Delta_err_p +=(stars[0].poly[0].M[0].y-stars[0].yc)*(stars[0].poly[0].M[0].y-stars[0].yc)-(stars[1].poly[0].M[0].y-stars[1].yc)*(stars[1].poly[0].M[0].y-stars[1].yc);
+       Delta_err_p +=(stars[0].poly[0].M[0].z-stars[0].zc)*(stars[0].poly[0].M[0].z-stars[0].zc)-(stars[1].poly[0].M[0].z-stars[1].zc)*(stars[1].poly[0].M[0].z-stars[1].zc);
+
+       Delta_err_p /= 2.0;
 
 
 		if (j%(ntimes/100)==0){
@@ -253,9 +267,13 @@ int main(int argc, char* argv[]) {
 		    	}
 			}
 
+            MPI_Allreduce(&Delta_p, &Delta, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+            MPI_Allreduce(&Delta_err_p, &Delta_err, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
+
             MPI_Allreduce(&Rg_p, &Rg, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
             MPI_Allreduce(&Rg_err_p, &Rg_err, 1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-            cout << "\t\t " << "; Rg = " << Rg/(j+1)/np << "; error +-   " << Rg_err/np  << endl;
+            cout << "\t\t " << "; Rg    = " << Rg/(j+1)/np << "; error +-   " << Rg_err/np  << endl;
+            cout << "\t\t " << "; Delta = " << Delta/(j+1)/np << "; error +-   " << Delta_err/np  << endl;
 
 
 			MPI_Allreduce(&hist_p, &hist, nbins, MPI_INT, MPI_SUM, MPI_COMM_WORLD);
