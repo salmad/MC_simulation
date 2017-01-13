@@ -1,4 +1,6 @@
 # MC_simulation
+<<<<<<< HEAD
+=======
 
 Mad_MC is a Monte-Carlo based software package for performing and analyzing scientific many-particle simulations of coarse-grained atomistic or bead-spring models used in soft-matter research in physics, chemistry and molecular biology. It can be used to simulate systems such as polymers, liquid crystals, colloids and biological systems, for example microgels, DNA and lipid membranes.
 
@@ -15,3 +17,4 @@ Mad_MC is free, open-source software published under the GNU General Public Lice
 
 Enjoy!
 
+>>>>>>> stars
